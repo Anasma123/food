@@ -32,6 +32,7 @@ import {
   Home,
   LogIn,
   UserPlus,
+  Users,
   ArrowRight,
   ShieldCheck,
   Smartphone,
@@ -118,6 +119,105 @@ interface MealLogItem {
   glycemicIndex?: number;
 }
 
+export interface RegisteredUserAccount {
+  id: string;
+  name: string;
+  email: string;
+  password?: string;
+  age: number;
+  gender: string;
+  weightKg: number;
+  heightCm: number;
+  bmi: number;
+  goal: string;
+  activityLevel: string;
+  dietaryPreference: string;
+  allergies: string;
+  dailyCalorieTarget: number;
+  dailySugarLimitGrams: number;
+  registeredAt: string;
+  role: "user" | "admin";
+}
+
+const DEFAULT_REGISTERED_USERS: RegisteredUserAccount[] = [
+  {
+    id: "usr_admin_silu",
+    name: "Silu (Chief Admin)",
+    email: "silu@foodsafety.gov.in",
+    password: "12345",
+    age: 32,
+    gender: "male",
+    weightKg: 74,
+    heightCm: 176,
+    bmi: 23.9,
+    goal: "maintenance",
+    activityLevel: "moderate",
+    dietaryPreference: "non_veg",
+    allergies: "none",
+    dailyCalorieTarget: 2150,
+    dailySugarLimitGrams: 25.0,
+    registeredAt: "Oct 1, 2026, 09:00 AM",
+    role: "admin"
+  },
+  {
+    id: "usr_rahul_sharma",
+    name: "Rahul Sharma",
+    email: "rahul.s@health.in",
+    password: "12345",
+    age: 48,
+    gender: "male",
+    weightKg: 82,
+    heightCm: 172,
+    bmi: 27.7,
+    goal: "diabetic_care",
+    activityLevel: "light",
+    dietaryPreference: "veg",
+    allergies: "none",
+    dailyCalorieTarget: 1750,
+    dailySugarLimitGrams: 15.0,
+    registeredAt: "Oct 2, 2026, 11:30 AM",
+    role: "user"
+  },
+  {
+    id: "usr_anjali_nair",
+    name: "Anjali Nair",
+    email: "anjali.nair@kerala.diet",
+    password: "12345",
+    age: 28,
+    gender: "female",
+    weightKg: 68,
+    heightCm: 163,
+    bmi: 25.6,
+    goal: "weight_loss",
+    activityLevel: "moderate",
+    dietaryPreference: "non_veg",
+    allergies: "lactose",
+    dailyCalorieTarget: 1550,
+    dailySugarLimitGrams: 20.0,
+    registeredAt: "Oct 3, 2026, 03:15 PM",
+    role: "user"
+  },
+  {
+    id: "usr_mohammed_faizal",
+    name: "Mohammed Faizal",
+    email: "faizal.m@fitness.org",
+    password: "12345",
+    age: 25,
+    gender: "male",
+    weightKg: 72,
+    heightCm: 178,
+    bmi: 22.7,
+    goal: "muscle_gain",
+    activityLevel: "active",
+    dietaryPreference: "non_veg",
+    allergies: "none",
+    dailyCalorieTarget: 2450,
+    dailySugarLimitGrams: 35.0,
+    registeredAt: "Oct 4, 2026, 08:45 AM",
+    role: "user"
+  }
+];
+
 export default function AIFoodProductionApp() {
   // Navigation State: Starts on "home" (Landing Page)
   const [activeTab, setActiveTab] = useState<
@@ -137,6 +237,15 @@ export default function AIFoodProductionApp() {
 
   // Unified 3-dots navigation & tools menu drawer toggle
   const [moreDotsMenuOpen, setMoreDotsMenuOpen] = useState(false);
+
+  // Registered Users Directory State (Persistent in localStorage for Admin Oversight)
+  const [registeredUsersList, setRegisteredUsersList] = useState<RegisteredUserAccount[]>([]);
+  const [adminUserSearchQuery, setAdminUserSearchQuery] = useState("");
+  const [adminUserGoalFilter, setAdminUserGoalFilter] = useState("all");
+  const [selectedAdminUserDetail, setSelectedAdminUserDetail] = useState<RegisteredUserAccount | null>(null);
+  const [adminEditingUser, setAdminEditingUser] = useState<RegisteredUserAccount | null>(null);
+  const [adminEditCalories, setAdminEditCalories] = useState("");
+  const [adminEditSugar, setAdminEditSugar] = useState("");
 
   // Authentication State (Common Login for everyone: Admin silu/12345 or Regular Users)
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -566,68 +675,110 @@ export default function AIFoodProductionApp() {
     ];
   };
 
-  // Persistent session loader
+  // Persistent session & registered users registry loader
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("aifood_user_session");
-      if (saved) {
+      // 1. Load or Initialize Registered Users List (Live database for Admin oversight)
+      const savedUsers = localStorage.getItem("aifood_registered_users");
+      let currentUsersList: RegisteredUserAccount[] = DEFAULT_REGISTERED_USERS;
+      if (savedUsers) {
         try {
-          const parsed = JSON.parse(saved);
+          const parsedU = JSON.parse(savedUsers);
+          if (Array.isArray(parsedU) && parsedU.length > 0) {
+            currentUsersList = parsedU;
+          } else {
+            localStorage.setItem("aifood_registered_users", JSON.stringify(DEFAULT_REGISTERED_USERS));
+          }
+        } catch {
+          localStorage.setItem("aifood_registered_users", JSON.stringify(DEFAULT_REGISTERED_USERS));
+        }
+      } else {
+        localStorage.setItem("aifood_registered_users", JSON.stringify(DEFAULT_REGISTERED_USERS));
+      }
+      setRegisteredUsersList(currentUsersList);
+
+      // Pre-seed sample meals for Rahul Sharma (Diabetic Care) if not existing
+      if (!localStorage.getItem("aifood_meals_rahul.s@health.in")) {
+        const rahulMeals = generateDefaultHistoricalMeals().slice(0, 4);
+        localStorage.setItem("aifood_meals_rahul.s@health.in", JSON.stringify(rahulMeals));
+      }
+      // Pre-seed sample meals for Anjali Nair (Weight Loss) if not existing
+      if (!localStorage.getItem("aifood_meals_anjali.nair@kerala.diet")) {
+        const anjaliMeals = generateDefaultHistoricalMeals().slice(3, 7);
+        localStorage.setItem("aifood_meals_anjali.nair@kerala.diet", JSON.stringify(anjaliMeals));
+      }
+
+      // 2. Check for Active User Session
+      const savedSession = localStorage.getItem("aifood_user_session");
+      const adminFlag = localStorage.getItem("aifood_is_admin");
+
+      if (adminFlag === "true") {
+        setIsAdminLoggedIn(true);
+        setIsLoggedIn(true);
+        if (savedSession) {
+          try { setUserProfile(JSON.parse(savedSession)); } catch {}
+        }
+        // Load admin test meals
+        const adminMeals = localStorage.getItem("aifood_meals_silu@foodsafety.gov.in") || localStorage.getItem("aifood_logged_meals");
+        if (adminMeals) {
+          try {
+            const parsed = JSON.parse(adminMeals);
+            setTodayMeals(Array.isArray(parsed) && parsed.length > 0 ? parsed : generateDefaultHistoricalMeals());
+          } catch {
+            setTodayMeals(generateDefaultHistoricalMeals());
+          }
+        } else {
+          setTodayMeals(generateDefaultHistoricalMeals());
+        }
+      } else if (savedSession) {
+        try {
+          const parsed = JSON.parse(savedSession);
           setUserProfile(parsed);
           setIsLoggedIn(true);
+          setIsAdminLoggedIn(false);
+
+          // Load THIS specific user's meals (Clean empty array if brand new!)
+          const userKey = (parsed.email || "user").toLowerCase().trim();
+          const userMealsStr = localStorage.getItem(`aifood_meals_${userKey}`);
+          if (userMealsStr) {
+            try {
+              const parsedMeals = JSON.parse(userMealsStr);
+              setTodayMeals(Array.isArray(parsedMeals) ? parsedMeals : []);
+            } catch {
+              setTodayMeals([]);
+            }
+          } else {
+            // New user starts with empty personal log
+            setTodayMeals([]);
+          }
+
+          // Load THIS specific user's workouts
+          const userWorkoutsStr = localStorage.getItem(`aifood_workouts_${userKey}`);
+          if (userWorkoutsStr) {
+            try {
+              const parsedW = JSON.parse(userWorkoutsStr);
+              setTodayWorkouts(Array.isArray(parsedW) ? parsedW : []);
+            } catch {
+              setTodayWorkouts([]);
+            }
+          } else {
+            setTodayWorkouts([]);
+          }
+
+          // Load THIS specific user's water intake
+          const userWaterStr = localStorage.getItem(`aifood_water_${userKey}`);
+          setWaterGlassesCount(Number(userWaterStr) || 0);
+
         } catch (e) {
           console.error("Session load error:", e);
         }
-      }
-
-      const adminFlag = localStorage.getItem("aifood_is_admin");
-      if (adminFlag === "true") {
-        setIsAdminLoggedIn(true);
-      }
-
-      const savedMeals = localStorage.getItem("aifood_logged_meals");
-      if (savedMeals) {
-        try {
-          const parsed = JSON.parse(savedMeals);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setTodayMeals(parsed.map((m: any) => ({ ...m, date: m.date || getTodayDateStr() })));
-          } else {
-            const defaults = generateDefaultHistoricalMeals();
-            setTodayMeals(defaults);
-            localStorage.setItem("aifood_logged_meals", JSON.stringify(defaults));
-          }
-        } catch (e) {
-          console.error("Meals load error:", e);
-        }
       } else {
-        const defaults = generateDefaultHistoricalMeals();
-        setTodayMeals(defaults);
-        localStorage.setItem("aifood_logged_meals", JSON.stringify(defaults));
-      }
-
-      const savedWorkouts = localStorage.getItem("aifood_logged_workouts");
-      if (savedWorkouts) {
-        try {
-          const parsedW = JSON.parse(savedWorkouts);
-          if (Array.isArray(parsedW) && parsedW.length > 0) {
-            setTodayWorkouts(parsedW.map((w: any) => ({ ...w, date: w.date || getTodayDateStr() })));
-          } else {
-            const defaultWorkouts = generateDefaultHistoricalWorkouts();
-            setTodayWorkouts(defaultWorkouts);
-            localStorage.setItem("aifood_logged_workouts", JSON.stringify(defaultWorkouts));
-          }
-        } catch (e) {
-          console.error("Workouts load error:", e);
-        }
-      } else {
-        const defaultWorkouts = generateDefaultHistoricalWorkouts();
-        setTodayWorkouts(defaultWorkouts);
-        localStorage.setItem("aifood_logged_workouts", JSON.stringify(defaultWorkouts));
-      }
-
-      const savedWater = localStorage.getItem("aifood_water_count");
-      if (savedWater) {
-        setWaterGlassesCount(Number(savedWater) || 4);
+        // Not logged in (Guest mode)
+        setIsLoggedIn(false);
+        setIsAdminLoggedIn(false);
+        setTodayMeals([]);
+        setTodayWorkouts([]);
+        setWaterGlassesCount(0);
       }
 
       const savedLang = localStorage.getItem("aifood_app_language") as AppLanguage;
@@ -683,11 +834,27 @@ export default function AIFoodProductionApp() {
     if (typeof window !== "undefined") {
       localStorage.removeItem("aifood_user_session");
       localStorage.removeItem("aifood_is_admin");
-      localStorage.removeItem("aifood_logged_workouts");
-      localStorage.removeItem("aifood_water_count");
     }
+    setTodayMeals([]);
+    setTodayWorkouts([]);
+    setWaterGlassesCount(0);
+    setUserProfile({
+      name: "Guest",
+      email: "",
+      age: 26,
+      weightKg: 70,
+      heightCm: 172,
+      gender: "male",
+      goal: "weight_loss",
+      activityLevel: "light",
+      dietaryPreference: "non_veg",
+      allergies: "none",
+      dailyCalorieTarget: 1850,
+      dailySugarLimitGrams: 20.0
+    });
     setShowProfileModal(false);
     setActiveTab("home");
+    triggerToast("✓ Signed out successfully.");
   };
 
   // --------------------------------------------------------------------------
@@ -744,6 +911,8 @@ export default function AIFoodProductionApp() {
   const saveMealsToStorage = (meals: MealLogItem[]) => {
     setTodayMeals(meals);
     if (typeof window !== "undefined") {
+      const userKey = (userProfile.email || "guest").toLowerCase().trim();
+      localStorage.setItem(`aifood_meals_${userKey}`, JSON.stringify(meals));
       localStorage.setItem("aifood_logged_meals", JSON.stringify(meals));
     }
   };
@@ -751,6 +920,8 @@ export default function AIFoodProductionApp() {
   const saveWorkoutsToStorage = (workouts: DailyWorkoutLog[]) => {
     setTodayWorkouts(workouts);
     if (typeof window !== "undefined") {
+      const userKey = (userProfile.email || "guest").toLowerCase().trim();
+      localStorage.setItem(`aifood_workouts_${userKey}`, JSON.stringify(workouts));
       localStorage.setItem("aifood_logged_workouts", JSON.stringify(workouts));
     }
   };
@@ -759,6 +930,8 @@ export default function AIFoodProductionApp() {
     const validCount = Math.max(0, Math.min(20, count));
     setWaterGlassesCount(validCount);
     if (typeof window !== "undefined") {
+      const userKey = (userProfile.email || "guest").toLowerCase().trim();
+      localStorage.setItem(`aifood_water_${userKey}`, String(validCount));
       localStorage.setItem("aifood_water_count", String(validCount));
     }
   };
@@ -1298,7 +1471,64 @@ export default function AIFoodProductionApp() {
   const [complaintsList, setComplaintsList] = useState<any[]>([]);
   const [authoritiesList, setAuthoritiesList] = useState<any[]>([]);
   const [complaintSuccessNotice, setComplaintSuccessNotice] = useState("");
-  const [adminActiveSubTab, setAdminActiveSubTab] = useState<"complaints" | "ml_datasets">("complaints");
+  const [adminActiveSubTab, setAdminActiveSubTab] = useState<"complaints" | "users_directory" | "ml_datasets">("complaints");
+
+  // ADMIN ACTION: DELETE USER
+  const handleAdminDeleteUser = (userId: string) => {
+    const targetUser = registeredUsersList.find(u => u.id === userId);
+    if (!targetUser) return;
+    if (targetUser.role === "admin") {
+      triggerToast("⚠️ Cannot delete Chief Admin account!");
+      return;
+    }
+    const updated = registeredUsersList.filter(u => u.id !== userId);
+    setRegisteredUsersList(updated);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("aifood_registered_users", JSON.stringify(updated));
+    }
+    triggerToast(`✓ Removed user "${targetUser.name}" from registry.`);
+    if (selectedAdminUserDetail?.id === userId) {
+      setSelectedAdminUserDetail(null);
+    }
+  };
+
+  // ADMIN ACTION: UPDATE CLINICAL TARGETS FOR A USER
+  const handleAdminSaveEditedTargets = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adminEditingUser) return;
+    const newCal = Number(adminEditCalories) || adminEditingUser.dailyCalorieTarget;
+    const newSug = Number(adminEditSugar) || adminEditingUser.dailySugarLimitGrams;
+
+    const updated = registeredUsersList.map(u => {
+      if (u.id === adminEditingUser.id) {
+        return {
+          ...u,
+          dailyCalorieTarget: newCal,
+          dailySugarLimitGrams: newSug
+        };
+      }
+      return u;
+    });
+
+    setRegisteredUsersList(updated);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("aifood_registered_users", JSON.stringify(updated));
+      if (userProfile.email && userProfile.email.toLowerCase() === adminEditingUser.email.toLowerCase()) {
+        const updatedProf = { ...userProfile, dailyCalorieTarget: newCal, dailySugarLimitGrams: newSug };
+        setUserProfile(updatedProf);
+        localStorage.setItem("aifood_user_session", JSON.stringify(updatedProf));
+      }
+    }
+    triggerToast(`✓ Updated targets for ${adminEditingUser.name}: ${newCal} kcal, ${newSug}g sugar limit.`);
+    setAdminEditingUser(null);
+    if (selectedAdminUserDetail?.id === adminEditingUser.id) {
+      setSelectedAdminUserDetail({
+        ...selectedAdminUserDetail,
+        dailyCalorieTarget: newCal,
+        dailySugarLimitGrams: newSug
+      });
+    }
+  };
 
   const fetchComplaints = async () => {
     try {
@@ -1460,21 +1690,8 @@ export default function AIFoodProductionApp() {
     const inputPassword = authFormData.password.trim();
 
     // 1. Check if user is logging in as Admin (silu / 12345) via the common login!
-    if ((inputEmailOrUser === "silu" || inputEmailOrUser === "silu@admin.com") && inputPassword === "12345") {
-      const adminProfile = {
-        name: "Silu (Chief Admin)",
-        email: "silu@foodsafety.gov.in",
-        age: 32,
-        weightKg: 74,
-        heightCm: 176,
-        gender: "male",
-        goal: "maintenance",
-        activityLevel: "moderate",
-        dietaryPreference: "non_veg",
-        allergies: "none",
-        dailyCalorieTarget: 2150,
-        dailySugarLimitGrams: 25.0
-      };
+    if ((inputEmailOrUser === "silu" || inputEmailOrUser === "silu@admin.com" || inputEmailOrUser === "silu@foodsafety.gov.in") && inputPassword === "12345") {
+      const adminProfile = DEFAULT_REGISTERED_USERS[0];
       setIsAdminLoggedIn(true);
       setIsLoggedIn(true);
       setUserProfile(adminProfile);
@@ -1482,75 +1699,195 @@ export default function AIFoodProductionApp() {
         localStorage.setItem("aifood_user_session", JSON.stringify(adminProfile));
         localStorage.setItem("aifood_is_admin", "true");
       }
+      // Load admin meals
+      const adminMeals = localStorage.getItem("aifood_meals_silu@foodsafety.gov.in") || localStorage.getItem("aifood_logged_meals");
+      if (adminMeals) {
+        try {
+          const parsed = JSON.parse(adminMeals);
+          setTodayMeals(Array.isArray(parsed) && parsed.length > 0 ? parsed : generateDefaultHistoricalMeals());
+        } catch {
+          setTodayMeals(generateDefaultHistoricalMeals());
+        }
+      } else {
+        setTodayMeals(generateDefaultHistoricalMeals());
+      }
       setAuthModalOpen(false);
+      triggerToast("✓ Logged in as Chief Safety Admin (Silu)!");
       setActiveTab("food_safety");
       return;
     }
 
-    // 2. Regular User Login or Register
-    const weight = Number(authFormData.weightKg) || 70;
-    const height = Number(authFormData.heightCm) || 170;
-    const age = Number(authFormData.age) || 25;
-    const isFemale = authFormData.gender === "female";
+    // 2. REGISTER NEW USER (Fresh data - clean slate!)
+    if (authMode === "register") {
+      if (!authFormData.name.trim()) {
+        setAuthErrorMsg("Please enter your full name.");
+        return;
+      }
+      if (!inputEmailOrUser) {
+        setAuthErrorMsg("Please provide a valid email address.");
+        return;
+      }
 
-    const bmr = isFemale
-      ? 10 * weight + 6.25 * height - 5 * age - 161
-      : 10 * weight + 6.25 * height - 5 * age + 5;
+      // Check if user is already registered in our registry
+      const existingUser = registeredUsersList.find(u => u.email.toLowerCase() === inputEmailOrUser);
+      if (existingUser) {
+        setAuthErrorMsg(`An account with email "${inputEmailOrUser}" is already registered! Please click "Sign In" below instead.`);
+        return;
+      }
 
-    const activityMultipliers: Record<string, number> = {
-      sedentary: 1.2,
-      light: 1.375,
-      moderate: 1.55,
-      active: 1.725
-    };
-    const multiplier = activityMultipliers[authFormData.activityLevel || "light"] || 1.35;
-    const tdee = Math.round(bmr * multiplier);
+      const weight = Number(authFormData.weightKg) || 70;
+      const height = Number(authFormData.heightCm) || 170;
+      const age = Number(authFormData.age) || 25;
+      const isFemale = authFormData.gender === "female";
 
-    let dailyCal = tdee;
-    let dailySugar = 25.0;
+      const bmr = isFemale
+        ? 10 * weight + 6.25 * height - 5 * age - 161
+        : 10 * weight + 6.25 * height - 5 * age + 5;
 
-    if (authFormData.goal === "weight_loss") {
-      dailyCal = Math.max(1200, Math.round(tdee - 450));
-      dailySugar = 20.0;
-    } else if (authFormData.goal === "diabetic_care") {
-      dailyCal = Math.round(tdee - 150);
-      dailySugar = 15.0;
-    } else if (authFormData.goal === "muscle_gain") {
-      dailyCal = Math.round(tdee + 350);
-      dailySugar = 35.0;
-    } else {
-      dailyCal = tdee;
-      dailySugar = 25.0;
+      const activityMultipliers: Record<string, number> = {
+        sedentary: 1.2,
+        light: 1.375,
+        moderate: 1.55,
+        active: 1.725
+      };
+      const multiplier = activityMultipliers[authFormData.activityLevel || "light"] || 1.35;
+      const tdee = Math.round(bmr * multiplier);
+
+      let dailyCal = tdee;
+      let dailySugar = 25.0;
+
+      if (authFormData.goal === "weight_loss") {
+        dailyCal = Math.max(1200, Math.round(tdee - 450));
+        dailySugar = 20.0;
+      } else if (authFormData.goal === "diabetic_care") {
+        dailyCal = Math.round(tdee - 150);
+        dailySugar = 15.0;
+      } else if (authFormData.goal === "muscle_gain") {
+        dailyCal = Math.round(tdee + 350);
+        dailySugar = 35.0;
+      } else {
+        dailyCal = tdee;
+        dailySugar = 25.0;
+      }
+
+      const calculatedBmi = +(weight / Math.pow(height / 100, 2)).toFixed(1);
+
+      const newAccount: RegisteredUserAccount = {
+        id: `usr_${Date.now()}`,
+        name: authFormData.name.trim(),
+        email: inputEmailOrUser,
+        password: authFormData.password || "12345",
+        age: age,
+        gender: authFormData.gender || "male",
+        weightKg: weight,
+        heightCm: height,
+        bmi: calculatedBmi,
+        goal: authFormData.goal || "weight_loss",
+        activityLevel: authFormData.activityLevel || "light",
+        dietaryPreference: authFormData.dietaryPreference || "non_veg",
+        allergies: authFormData.allergies || "none",
+        dailyCalorieTarget: dailyCal,
+        dailySugarLimitGrams: dailySugar,
+        registeredAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" }),
+        role: "user"
+      };
+
+      // Add to registered users list in state & localStorage
+      const updatedUsers = [...registeredUsersList, newAccount];
+      setRegisteredUsersList(updatedUsers);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("aifood_registered_users", JSON.stringify(updatedUsers));
+      }
+
+      // CRITICAL: Fresh clean slate for the newly registered user!
+      // Their personal log starts with 0 consumed calories and 0 logged meals.
+      setTodayMeals([]);
+      setTodayWorkouts([]);
+      setWaterGlassesCount(0);
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem(`aifood_meals_${inputEmailOrUser}`, JSON.stringify([]));
+        localStorage.setItem(`aifood_workouts_${inputEmailOrUser}`, JSON.stringify([]));
+        localStorage.setItem(`aifood_water_${inputEmailOrUser}`, "0");
+        localStorage.setItem("aifood_user_session", JSON.stringify(newAccount));
+        localStorage.removeItem("aifood_is_admin");
+      }
+
+      setIsAdminLoggedIn(false);
+      setIsLoggedIn(true);
+      setUserProfile(newAccount);
+      setAuthModalOpen(false);
+      triggerToast(`✓ Registration Successful! Welcome, ${newAccount.name}. Your personal dashboard has been set to ${newAccount.dailyCalorieTarget} kcal.`);
+      setActiveTab("dashboard");
+      return;
     }
 
-    const calculatedProfile = {
-      name: authFormData.name || "Healthy User",
-      email: authFormData.email,
-      age: age,
-      weightKg: weight,
-      heightCm: height,
-      gender: authFormData.gender || "male",
-      goal: authFormData.goal,
-      activityLevel: authFormData.activityLevel || "light",
-      dietaryPreference: authFormData.dietaryPreference || "non_veg",
-      allergies: authFormData.allergies || "none",
-      dailyCalorieTarget: dailyCal,
-      dailySugarLimitGrams: dailySugar
-    };
+    // 3. LOGIN EXISTING USER
+    if (authMode === "login") {
+      const foundUser = registeredUsersList.find(u => u.email.toLowerCase() === inputEmailOrUser);
+      if (!foundUser) {
+        setAuthErrorMsg(`No account found for "${inputEmailOrUser}". Please click "Register & calculate body metrics" below to create an account!`);
+        return;
+      }
 
-    setIsAdminLoggedIn(false);
-    setIsLoggedIn(true);
-    setUserProfile(calculatedProfile);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("aifood_user_session", JSON.stringify(calculatedProfile));
-      localStorage.removeItem("aifood_is_admin");
+      if (foundUser.password && inputPassword && foundUser.password !== inputPassword) {
+        setAuthErrorMsg("Incorrect password. Please enter the valid password you registered with.");
+        return;
+      }
+
+      setIsAdminLoggedIn(foundUser.role === "admin");
+      setIsLoggedIn(true);
+      setUserProfile(foundUser);
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem("aifood_user_session", JSON.stringify(foundUser));
+        if (foundUser.role === "admin") {
+          localStorage.setItem("aifood_is_admin", "true");
+        } else {
+          localStorage.removeItem("aifood_is_admin");
+        }
+
+        // Load THIS user's scoped meals
+        const userKey = foundUser.email.toLowerCase().trim();
+        const storedMeals = localStorage.getItem(`aifood_meals_${userKey}`);
+        if (storedMeals) {
+          try {
+            const parsed = JSON.parse(storedMeals);
+            setTodayMeals(Array.isArray(parsed) ? parsed : []);
+          } catch {
+            setTodayMeals([]);
+          }
+        } else {
+          setTodayMeals([]);
+        }
+
+        // Load THIS user's workouts
+        const storedWorkouts = localStorage.getItem(`aifood_workouts_${userKey}`);
+        if (storedWorkouts) {
+          try {
+            const parsedW = JSON.parse(storedWorkouts);
+            setTodayWorkouts(Array.isArray(parsedW) ? parsedW : []);
+          } catch {
+            setTodayWorkouts([]);
+          }
+        } else {
+          setTodayWorkouts([]);
+        }
+
+        // Load THIS user's water
+        const storedWater = localStorage.getItem(`aifood_water_${userKey}`);
+        setWaterGlassesCount(Number(storedWater) || 0);
+      }
+
+      setAuthModalOpen(false);
+      triggerToast(`✓ Welcome back, ${foundUser.name}!`);
+      setActiveTab(foundUser.role === "admin" ? "food_safety" : "dashboard");
+      return;
     }
-    setAuthModalOpen(false);
-    setActiveTab("dashboard");
   };
 
   return (
-    <div className="min-h-screen bg-[#050811] text-slate-100 font-sans selection:bg-emerald-500/30 selection:text-emerald-200 pb-24 md:pb-8">
+    <div className="min-h-screen bg-[#050811] text-slate-100 font-sans selection:bg-emerald-500/30 selection:text-emerald-200 pb-24 md:pb-8 w-full max-w-full overflow-x-hidden">
       {/* Background Dynamic Light Orbs */}
       <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
         <div className="absolute -top-40 -left-20 w-[600px] h-[600px] bg-emerald-600/10 rounded-full blur-[150px]" />
@@ -1561,27 +1898,27 @@ export default function AIFoodProductionApp() {
       {/* =================================================================== */}
       {/* TOP HEADER / APP BAR */}
       {/* =================================================================== */}
-      <header className="sticky top-0 z-40 backdrop-blur-xl bg-[#080d19]/90 border-b border-white/10 px-4 lg:px-8 py-3.5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <header className="sticky top-0 z-40 backdrop-blur-xl bg-[#080d19]/90 border-b border-white/10 px-2.5 sm:px-4 lg:px-8 py-2.5 sm:py-3.5 flex items-center justify-between w-full max-w-full overflow-hidden">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <button
             onClick={() => setActiveTab("home")}
-            className="flex items-center gap-3 group text-left"
+            className="flex items-center gap-2 sm:gap-3 group text-left cursor-pointer"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-400 via-teal-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-slate-950 font-black text-xl group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-emerald-400 via-teal-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-slate-950 font-black text-base sm:text-xl group-hover:scale-105 transition-transform shrink-0">
               AI
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-black tracking-tight text-white group-hover:text-emerald-400 transition-colors">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="text-base sm:text-lg font-black tracking-tight text-white group-hover:text-emerald-400 transition-colors">
                   AIFood<span className="text-emerald-400">.</span>
                 </span>
                 {isAdminLoggedIn ? (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1">
+                  <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1 shrink-0">
                     <ShieldCheck className="w-3 h-3 text-amber-400" />
-                    Admin Access
+                    Admin
                   </span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                  <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                     Production
                   </span>
                 )}
@@ -1646,20 +1983,20 @@ export default function AIFoodProductionApp() {
         </div>
 
         {/* Header Actions: Language Switcher, Auth & Profile */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Global Language Selector Dropdown */}
           <div className="relative">
             <button
               onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-200 hover:text-white transition-all shadow-sm cursor-pointer"
+              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-200 hover:text-white transition-all shadow-sm cursor-pointer"
               title="Change Language / ഭാഷ മാറ്റുക / भाषा बदलें"
             >
-              <Globe className="w-3.5 h-3.5 text-emerald-400" />
+              <Globe className="w-3.5 h-3.5 text-emerald-400 hidden sm:inline" />
               <span className="text-sm">{(LANGUAGE_OPTIONS.find((l) => l.id === currentLanguage) || LANGUAGE_OPTIONS[0]).flag}</span>
-              <span className="hidden sm:inline font-medium">
+              <span className="hidden md:inline font-medium">
                 {(LANGUAGE_OPTIONS.find((l) => l.id === currentLanguage) || LANGUAGE_OPTIONS[0]).label}
               </span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
+              <ChevronDown className="w-3 h-3 text-slate-400 hidden sm:inline" />
             </button>
 
             {languageDropdownOpen && (
@@ -1703,32 +2040,45 @@ export default function AIFoodProductionApp() {
           </div>
 
           {isLoggedIn ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              {isAdminLoggedIn && (
+                <button
+                  onClick={() => {
+                    setActiveTab("food_safety");
+                    setAdminActiveSubTab("users_directory");
+                  }}
+                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-amber-200 text-xs font-bold transition-all cursor-pointer shadow-sm"
+                  title="View All Registered Users and Clinical Profiles"
+                >
+                  <Users className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Users ({registeredUsersList.length})</span>
+                </button>
+              )}
               <button
                 onClick={() => setShowProfileModal(true)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs transition-colors ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-xl border text-xs transition-colors max-w-[120px] sm:max-w-none ${
                   isAdminLoggedIn
                     ? "bg-amber-500/10 border-amber-500/30 text-amber-200 hover:bg-amber-500/20"
                     : "bg-white/5 hover:bg-white/10 border-white/10 text-slate-200"
                 }`}
               >
-                <div className={`w-2 h-2 rounded-full ${isAdminLoggedIn ? "bg-amber-400" : "bg-emerald-400"} animate-pulse`} />
-                <span className="font-semibold">{userProfile.name}</span>
-                <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded font-mono hidden sm:inline">
+                <div className={`w-2 h-2 rounded-full shrink-0 ${isAdminLoggedIn ? "bg-amber-400" : "bg-emerald-400"} animate-pulse`} />
+                <span className="font-semibold truncate text-xs">{userProfile.name}</span>
+                <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded font-mono hidden md:inline">
                   {userProfile.dailyCalorieTarget} kcal
                 </span>
-                <Sliders className="w-3.5 h-3.5 text-slate-400" />
+                <Sliders className="w-3 h-3 text-slate-400 shrink-0 hidden sm:inline" />
               </button>
               <button
                 onClick={handleLogout}
-                className="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-rose-500/15 border border-white/10 text-slate-400 hover:text-rose-300 text-xs transition-colors"
+                className="hidden sm:inline-flex px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-rose-500/15 border border-white/10 text-slate-400 hover:text-rose-300 text-xs transition-colors"
                 title="Sign Out"
               >
                 {ui.logout}
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <button
                 onClick={() => {
                   setAuthMode("login");
@@ -1736,7 +2086,7 @@ export default function AIFoodProductionApp() {
                   setAuthErrorMsg("");
                   setAuthModalOpen(true);
                 }}
-                className="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
+                className="hidden sm:inline-flex px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
               >
                 {ui.login}
               </button>
@@ -1747,7 +2097,7 @@ export default function AIFoodProductionApp() {
                   setAuthErrorMsg("");
                   setAuthModalOpen(true);
                 }}
-                className="px-4 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 hover:brightness-110 shadow-lg shadow-emerald-500/20 transition-all"
+                className="px-2.5 sm:px-4 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 hover:brightness-110 shadow-md shadow-emerald-500/20 transition-all whitespace-nowrap cursor-pointer"
               >
                 {ui.register}
               </button>
@@ -1760,7 +2110,7 @@ export default function AIFoodProductionApp() {
               setMoreDotsMenuOpen(!moreDotsMenuOpen);
               if (languageDropdownOpen) setLanguageDropdownOpen(false);
             }}
-            className={`p-2 sm:p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+            className={`p-2 sm:p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 ${
               moreDotsMenuOpen
                 ? "bg-rose-500/20 text-rose-300 border-rose-500/40 shadow-lg shadow-rose-500/10"
                 : "bg-white/5 hover:bg-white/10 border-white/10 text-slate-300 hover:text-white"
@@ -1909,6 +2259,25 @@ export default function AIFoodProductionApp() {
                   </span>
                   <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
                 </button>
+
+                {isAdminLoggedIn && (
+                  <button
+                    onClick={() => {
+                      setMoreDotsMenuOpen(false);
+                      setActiveTab("food_safety");
+                      setAdminActiveSubTab("users_directory");
+                    }}
+                    className="w-full flex items-center justify-between p-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-amber-200 text-xs font-bold transition-all cursor-pointer"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Users className="w-3.5 h-3.5 text-amber-400" />
+                      <span>👥 Registered Users & Clinical Directory</span>
+                    </span>
+                    <span className="text-[10px] bg-amber-500/30 text-amber-200 px-2 py-0.5 rounded font-mono font-bold">
+                      {registeredUsersList.length} Users
+                    </span>
+                  </button>
+                )}
               </div>
 
               {/* CLINICAL TOOLS & SHORTCUTS SECTION */}
@@ -2072,7 +2441,7 @@ export default function AIFoodProductionApp() {
       )}
 
       {/* GLOBAL RESPONSIVE SUB-NAVBAR MENU STRIP (ACCESSIBLE ON MOBILE/TABLET) */}
-      <div className="border-b border-white/10 bg-[#070b15]/95 sticky top-[61px] sm:top-[65px] z-30 backdrop-blur-xl px-2 sm:px-4 lg:px-8 overflow-x-auto scrollbar-none shadow-md lg:hidden">
+      <div className="border-b border-white/10 bg-[#070b15]/95 sticky top-[53px] sm:top-[65px] z-30 backdrop-blur-xl px-2 sm:px-4 lg:px-8 overflow-x-auto scrollbar-none shadow-md lg:hidden w-full max-w-full">
         <div className="flex items-center gap-1.5 sm:gap-2 py-2 min-w-max">
           {[
             { id: "home", label: ui.home, icon: Home },
@@ -2109,7 +2478,7 @@ export default function AIFoodProductionApp() {
       {/* =================================================================== */}
       {/* MAIN CONTAINER */}
       {/* =================================================================== */}
-      <main className="max-w-7xl mx-auto px-4 lg:px-8 pt-6">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 pt-4 sm:pt-6 w-full max-w-full overflow-x-hidden">
 
         {/* ================================================================= */}
         {/* VIEW 0: DEDICATED HOME / LANDING PAGE */}
@@ -4881,7 +5250,7 @@ export default function AIFoodProductionApp() {
             {/* ADMIN CONSOLE VIEW (When logged in as silu / 12345 via common login) */}
             {isAdminLoggedIn ? (
               <div className="space-y-6 animate-fadeIn">
-                <div className="flex items-center gap-2 border-b border-white/10 pb-3">
+                <div className="flex flex-wrap items-center gap-2 border-b border-white/10 pb-3">
                   <button
                     onClick={() => setAdminActiveSubTab("complaints")}
                     className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
@@ -4890,7 +5259,17 @@ export default function AIFoodProductionApp() {
                         : "text-slate-400 hover:text-white"
                     }`}
                   >
-                    Grievance Moderation & Email Dispatch ({complaintsList.length})
+                    Grievance Moderation ({complaintsList.length})
+                  </button>
+                  <button
+                    onClick={() => setAdminActiveSubTab("users_directory")}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      adminActiveSubTab === "users_directory"
+                        ? "bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    <Users className="w-3.5 h-3.5" /> Registered Users & Clinical Directory ({registeredUsersList.length})
                   </button>
                   <button
                     onClick={() => setAdminActiveSubTab("ml_datasets")}
@@ -4900,7 +5279,7 @@ export default function AIFoodProductionApp() {
                         : "text-slate-400 hover:text-white"
                     }`}
                   >
-                    Backend ML & 10 Datasets Engine
+                    Backend ML & Datasets
                   </button>
                 </div>
 
@@ -5044,6 +5423,319 @@ export default function AIFoodProductionApp() {
                         </div>
                       </div>
                     </div>
+                  </div>
+                )}
+
+                {/* Subtab C: Registered Users & Clinical Directory */}
+                {adminActiveSubTab === "users_directory" && (
+                  <div className="space-y-6">
+                    {/* Header Banner */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-r from-cyan-950/40 via-blue-950/30 to-purple-950/40 border border-cyan-500/20">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="p-1.5 rounded-lg bg-cyan-500/20 text-cyan-400">
+                            <Users className="w-5 h-5" />
+                          </span>
+                          <h3 className="text-base font-bold text-white">Registered Users & Clinical Profiles</h3>
+                          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                            {registeredUsersList.length} Accounts
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-300">
+                          Inspect patient biometrics, computed BMR/TDEE targets, daily sugar allowances, and scoped live food logs.
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          setAuthMode("register");
+                          setAuthModalOpen(true);
+                        }}
+                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 cursor-pointer transition-all shrink-0"
+                      >
+                        <UserPlus className="w-4 h-4" />
+                        + Register New Patient
+                      </button>
+                    </div>
+
+                    {/* Stats Metrics Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <div className="p-4 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-sm">
+                        <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
+                          <span>Total Registered</span>
+                          <Users className="w-4 h-4 text-cyan-400" />
+                        </div>
+                        <p className="text-2xl font-black text-white">{registeredUsersList.length}</p>
+                        <p className="text-[10px] text-slate-400 mt-0.5">Active profiles stored</p>
+                      </div>
+
+                      <div className="p-4 rounded-xl bg-white/[0.04] border border-amber-500/20 backdrop-blur-sm">
+                        <div className="flex items-center justify-between text-amber-300 text-xs mb-1">
+                          <span>Diabetic Care</span>
+                          <HeartPulse className="w-4 h-4 text-amber-400" />
+                        </div>
+                        <p className="text-2xl font-black text-amber-400">
+                          {registeredUsersList.filter((u) => u.goal === "diabetic_care").length}
+                        </p>
+                        <p className="text-[10px] text-slate-400 mt-0.5">Strict sugar monitoring</p>
+                      </div>
+
+                      <div className="p-4 rounded-xl bg-white/[0.04] border border-rose-500/20 backdrop-blur-sm">
+                        <div className="flex items-center justify-between text-rose-300 text-xs mb-1">
+                          <span>Weight Loss / Mgmt</span>
+                          <Flame className="w-4 h-4 text-rose-400" />
+                        </div>
+                        <p className="text-2xl font-black text-rose-400">
+                          {registeredUsersList.filter((u) => u.goal === "weight_loss" || u.goal === "weight_gain").length}
+                        </p>
+                        <p className="text-[10px] text-slate-400 mt-0.5">Caloric deficit / surplus</p>
+                      </div>
+
+                      <div className="p-4 rounded-xl bg-white/[0.04] border border-emerald-500/20 backdrop-blur-sm">
+                        <div className="flex items-center justify-between text-emerald-300 text-xs mb-1">
+                          <span>Special Allergies</span>
+                          <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                        </div>
+                        <p className="text-2xl font-black text-emerald-400">
+                          {registeredUsersList.filter((u) => u.allergies && u.allergies.length > 0).length}
+                        </p>
+                        <p className="text-[10px] text-slate-400 mt-0.5">Allergen safety enabled</p>
+                      </div>
+                    </div>
+
+                    {/* Filter and Search Bar */}
+                    <div className="flex flex-col sm:flex-row items-center gap-3 bg-white/[0.03] p-3 rounded-2xl border border-white/10">
+                      <div className="relative flex-1 w-full">
+                        <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input
+                          type="text"
+                          value={adminUserSearchQuery}
+                          onChange={(e) => setAdminUserSearchQuery(e.target.value)}
+                          placeholder="Search patient by name or email..."
+                          className="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-black/40 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400"
+                        />
+                      </div>
+
+                      <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <Filter className="w-4 h-4 text-slate-400 shrink-0" />
+                        <select
+                          value={adminUserGoalFilter}
+                          onChange={(e) => setAdminUserGoalFilter(e.target.value)}
+                          className="w-full sm:w-auto px-3 py-2 text-xs rounded-xl bg-slate-900 border border-white/15 text-white focus:outline-none focus:border-cyan-400"
+                        >
+                          <option value="all">All Goals & Conditions</option>
+                          <option value="diabetic_care">Diabetic Care</option>
+                          <option value="weight_loss">Weight Loss</option>
+                          <option value="muscle_gain">Muscle Gain</option>
+                          <option value="maintain">Maintain Fitness</option>
+                          <option value="weight_gain">Weight Gain</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* User Profiles Grid */}
+                    {registeredUsersList.filter((u) => {
+                      const matchesSearch =
+                        adminUserSearchQuery.trim() === "" ||
+                        u.name.toLowerCase().includes(adminUserSearchQuery.toLowerCase()) ||
+                        u.email.toLowerCase().includes(adminUserSearchQuery.toLowerCase());
+                      const matchesGoal = adminUserGoalFilter === "all" || u.goal === adminUserGoalFilter;
+                      return matchesSearch && matchesGoal;
+                    }).length === 0 ? (
+                      <div className="text-center py-12 rounded-2xl bg-white/[0.02] border border-white/10">
+                        <Users className="w-10 h-10 text-slate-600 mx-auto mb-2" />
+                        <p className="text-sm font-bold text-slate-300">No users match your filter</p>
+                        <p className="text-xs text-slate-500 mt-1">Try clearing your search query or goal filter.</p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {registeredUsersList
+                          .filter((u) => {
+                            const matchesSearch =
+                              adminUserSearchQuery.trim() === "" ||
+                              u.name.toLowerCase().includes(adminUserSearchQuery.toLowerCase()) ||
+                              u.email.toLowerCase().includes(adminUserSearchQuery.toLowerCase());
+                            const matchesGoal = adminUserGoalFilter === "all" || u.goal === adminUserGoalFilter;
+                            return matchesSearch && matchesGoal;
+                          })
+                          .map((u) => {
+                            // Scoped meals for this user
+                            let userMealsCount = 0;
+                            let userTodayCalories = 0;
+                            try {
+                              const raw = localStorage.getItem("aifood_meals_" + u.email);
+                              if (raw) {
+                                const parsed = JSON.parse(raw);
+                                if (Array.isArray(parsed)) {
+                                  userMealsCount = parsed.length;
+                                  userTodayCalories = parsed.reduce((acc: number, m: any) => acc + (m.calories || 0), 0);
+                                }
+                              }
+                            } catch (e) {
+                              // ignore
+                            }
+
+                            const bmiColor =
+                              u.bmi < 18.5
+                                ? "text-cyan-400"
+                                : u.bmi <= 24.9
+                                ? "text-emerald-400"
+                                : u.bmi <= 29.9
+                                ? "text-amber-400"
+                                : "text-rose-400";
+
+                            const goalLabel =
+                              u.goal === "diabetic_care"
+                                ? "🩺 Diabetic Care"
+                                : u.goal === "weight_loss"
+                                ? "🔥 Weight Loss"
+                                : u.goal === "muscle_gain"
+                                ? "💪 Muscle Gain"
+                                : u.goal === "weight_gain"
+                                ? "📈 Weight Gain"
+                                : "⚖️ Maintain Balance";
+
+                            return (
+                              <div
+                                key={u.id}
+                                className="p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.05] border border-white/10 hover:border-cyan-500/30 transition-all flex flex-col justify-between space-y-4"
+                              >
+                                <div className="space-y-3">
+                                  {/* User Head */}
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="flex items-center gap-3">
+                                      <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-600 to-blue-600 text-slate-950 font-black text-sm flex items-center justify-center shadow-md shadow-cyan-500/20 shrink-0">
+                                        {u.name.substring(0, 2).toUpperCase()}
+                                      </div>
+                                      <div>
+                                        <div className="flex items-center gap-2">
+                                          <h4 className="text-sm font-bold text-white">{u.name}</h4>
+                                          {u.role === "admin" ? (
+                                            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                              CHIEF ADMIN
+                                            </span>
+                                          ) : (
+                                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
+                                              PATIENT
+                                            </span>
+                                          )}
+                                        </div>
+                                        <p className="text-xs text-slate-400">{u.email}</p>
+                                        <span className="text-[10px] text-slate-500">
+                                          Registered: {new Date(u.registeredAt).toLocaleDateString()}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    <span className="px-2.5 py-1 rounded-xl text-[11px] font-bold bg-white/5 border border-white/10 text-slate-300 shrink-0">
+                                      {goalLabel}
+                                    </span>
+                                  </div>
+
+                                  {/* Biometrics & Targets Pill Grid */}
+                                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-center">
+                                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
+                                      <span className="text-[10px] text-slate-400 block uppercase">Age / Sex</span>
+                                      <span className="text-xs font-bold text-white capitalize">
+                                        {u.age}y • {u.gender}
+                                      </span>
+                                    </div>
+                                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
+                                      <span className="text-[10px] text-slate-400 block uppercase">Ht / Wt</span>
+                                      <span className="text-xs font-bold text-white">
+                                        {u.heightCm}cm • {u.weightKg}kg
+                                      </span>
+                                    </div>
+                                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
+                                      <span className="text-[10px] text-slate-400 block uppercase">BMI</span>
+                                      <span className={`text-xs font-bold ${bmiColor}`}>
+                                        {u.bmi.toFixed(1)}
+                                      </span>
+                                    </div>
+                                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
+                                      <span className="text-[10px] text-slate-400 block uppercase">Diet</span>
+                                      <span className="text-xs font-bold text-white capitalize">
+                                        {u.dietaryPreference}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  {/* Clinical Nutrition Limits */}
+                                  <div className="flex flex-wrap items-center gap-2 text-xs">
+                                    <span className="px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-bold flex items-center gap-1">
+                                      <Flame className="w-3.5 h-3.5" /> Target: {u.dailyCalorieTarget} kcal/day
+                                    </span>
+                                    <span className="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 font-bold flex items-center gap-1">
+                                      <Candy className="w-3.5 h-3.5" /> Sugar Cap: {u.dailySugarLimitGrams}g
+                                    </span>
+                                    {u.allergies && (Array.isArray(u.allergies) ? u.allergies.length > 0 : String(u.allergies).trim() !== "") ? (
+                                      <span className="px-2.5 py-1 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 font-semibold text-[11px]">
+                                        ⚠️ Allergies: {Array.isArray(u.allergies) ? u.allergies.join(", ") : String(u.allergies)}
+                                      </span>
+                                    ) : (
+                                      <span className="px-2 py-0.5 rounded text-[11px] text-slate-500">
+                                        No allergies logged
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  {/* Scoped Live Food Log Status */}
+                                  <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between text-xs">
+                                    <span className="text-slate-400 flex items-center gap-1.5">
+                                      <Utensils className="w-3.5 h-3.5 text-slate-400" />
+                                      Food Diary Status:
+                                    </span>
+                                    {userMealsCount > 0 ? (
+                                      <span className="font-bold text-emerald-400">
+                                        {userMealsCount} meals logged ({userTodayCalories} kcal today)
+                                      </span>
+                                    ) : (
+                                      <span className="text-slate-500 italic">
+                                        Clean slate (0 meals logged)
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+                                  <button
+                                    onClick={() => setSelectedAdminUserDetail(u)}
+                                    className="px-3 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all"
+                                  >
+                                    <FileText className="w-3.5 h-3.5" />
+                                    View Full Details & Food Diary
+                                  </button>
+
+                                  <div className="flex items-center gap-1.5">
+                                    <button
+                                      onClick={() => {
+                                        setAdminEditingUser(u);
+                                        setAdminEditCalories(String(u.dailyCalorieTarget));
+                                        setAdminEditSugar(String(u.dailySugarLimitGrams));
+                                      }}
+                                      className="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs font-semibold flex items-center gap-1 cursor-pointer transition-all"
+                                      title="Edit Calorie & Sugar Targets"
+                                    >
+                                      <Sliders className="w-3.5 h-3.5 text-amber-400" />
+                                      Edit Targets
+                                    </button>
+
+                                    {u.email !== "silu" && (
+                                      <button
+                                        onClick={() => handleAdminDeleteUser(u.id)}
+                                        className="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 cursor-pointer transition-all"
+                                        title="Delete User Account"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -6132,6 +6824,348 @@ export default function AIFoodProductionApp() {
                 🗑️ Discard & Clear From Screen
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ADMIN INSPECT USER CLINICAL PROFILE & SCOPED FOOD DIARY MODAL */}
+      {selectedAdminUserDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+          <div className="max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-3xl bg-[#090d16] border border-white/20 p-6 shadow-2xl space-y-6 scrollbar-thin">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-600 to-blue-600 text-slate-950 font-black text-base flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                  {selectedAdminUserDetail.name.substring(0, 2).toUpperCase()}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-white">{selectedAdminUserDetail.name}</h3>
+                    {selectedAdminUserDetail.role === "admin" ? (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        CHIEF ADMIN
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                        PATIENT / USER
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-400">{selectedAdminUserDetail.email}</p>
+                  <p className="text-[10px] text-slate-500">
+                    ID: {selectedAdminUserDetail.id} • Registered: {new Date(selectedAdminUserDetail.registeredAt).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setSelectedAdminUserDetail(null)}
+                className="p-2 rounded-xl bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Section 1: Biometrics & Target Ceiling */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                Clinical Biometrics & Targets
+              </h4>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center">
+                  <span className="text-[10px] text-slate-400 block uppercase">Age / Gender</span>
+                  <span className="text-xs font-bold text-white capitalize">
+                    {selectedAdminUserDetail.age} yrs • {selectedAdminUserDetail.gender}
+                  </span>
+                </div>
+                <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center">
+                  <span className="text-[10px] text-slate-400 block uppercase">Height / Weight</span>
+                  <span className="text-xs font-bold text-white">
+                    {selectedAdminUserDetail.heightCm} cm • {selectedAdminUserDetail.weightKg} kg
+                  </span>
+                </div>
+                <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center">
+                  <span className="text-[10px] text-slate-400 block uppercase">BMI Status</span>
+                  <span
+                    className={`text-xs font-bold ${
+                      selectedAdminUserDetail.bmi < 18.5
+                        ? "text-cyan-400"
+                        : selectedAdminUserDetail.bmi <= 24.9
+                        ? "text-emerald-400"
+                        : selectedAdminUserDetail.bmi <= 29.9
+                        ? "text-amber-400"
+                        : "text-rose-400"
+                    }`}
+                  >
+                    {selectedAdminUserDetail.bmi.toFixed(1)} (
+                    {selectedAdminUserDetail.bmi < 18.5
+                      ? "Underweight"
+                      : selectedAdminUserDetail.bmi <= 24.9
+                      ? "Healthy"
+                      : selectedAdminUserDetail.bmi <= 29.9
+                      ? "Overweight"
+                      : "Obese"}
+                    )
+                  </span>
+                </div>
+                <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center">
+                  <span className="text-[10px] text-slate-400 block uppercase">Activity Level</span>
+                  <span className="text-xs font-bold text-white capitalize">
+                    {selectedAdminUserDetail.activityLevel.replace("_", " ")}
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                <div className="p-3.5 rounded-xl bg-cyan-950/20 border border-cyan-500/20 flex items-center justify-between">
+                  <div>
+                    <span className="text-[11px] text-cyan-300 font-semibold block">Prescribed Daily Target</span>
+                    <span className="text-base font-black text-cyan-400">
+                      {selectedAdminUserDetail.dailyCalorieTarget} kcal/day
+                    </span>
+                  </div>
+                  <Flame className="w-6 h-6 text-cyan-400/60" />
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-amber-950/20 border border-amber-500/20 flex items-center justify-between">
+                  <div>
+                    <span className="text-[11px] text-amber-300 font-semibold block">Max Sugar Cap</span>
+                    <span className="text-base font-black text-amber-400">
+                      {selectedAdminUserDetail.dailySugarLimitGrams}g sugar/day
+                    </span>
+                  </div>
+                  <Candy className="w-6 h-6 text-amber-400/60" />
+                </div>
+              </div>
+
+              {/* Diet Pref & Allergies */}
+              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 text-xs flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <span className="text-slate-400">Dietary Regimen: </span>
+                  <span className="font-bold text-white capitalize">
+                    {selectedAdminUserDetail.dietaryPreference}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400">Allergies: </span>
+                  {selectedAdminUserDetail.allergies &&
+                  (Array.isArray(selectedAdminUserDetail.allergies)
+                    ? selectedAdminUserDetail.allergies.length > 0
+                    : String(selectedAdminUserDetail.allergies).trim() !== "") ? (
+                    <span className="font-bold text-rose-400">
+                      ⚠️{" "}
+                      {Array.isArray(selectedAdminUserDetail.allergies)
+                        ? selectedAdminUserDetail.allergies.join(", ")
+                        : String(selectedAdminUserDetail.allergies)}
+                    </span>
+                  ) : (
+                    <span className="text-emerald-400 font-semibold">None reported</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Section 2: Scoped Live Food Diary */}
+            <div className="space-y-3 pt-2 border-t border-white/10">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                    <Utensils className="w-4 h-4 text-emerald-400" />
+                    Live Scoped Food Diary for this Account
+                  </h4>
+                  <p className="text-[11px] text-slate-500">
+                    Data isolated under <code className="text-cyan-400">aifood_meals_{selectedAdminUserDetail.email}</code>
+                  </p>
+                </div>
+              </div>
+
+              {(() => {
+                let userMeals: any[] = [];
+                try {
+                  const raw = localStorage.getItem("aifood_meals_" + selectedAdminUserDetail.email);
+                  if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed)) {
+                      userMeals = parsed;
+                    }
+                  }
+                } catch (e) {
+                  // ignore
+                }
+
+                const totalKcal = userMeals.reduce((acc, m) => acc + (m.calories || 0), 0);
+                const totalSugar = userMeals.reduce((acc, m) => acc + (m.sugar || 0), 0);
+                const totalProtein = userMeals.reduce((acc, m) => acc + (m.protein || 0), 0);
+
+                if (userMeals.length === 0) {
+                  return (
+                    <div className="text-center py-8 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2">
+                      <Utensils className="w-8 h-8 text-slate-600 mx-auto" />
+                      <p className="text-xs font-bold text-slate-300">Clean Slate — No Meals Logged Yet</p>
+                      <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
+                        This patient has registered with a clean slate. When they scan or log meals on their phone/browser, their live meals will automatically show up here.
+                      </p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="space-y-3">
+                    {/* Summary row */}
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5">
+                        <span className="text-[10px] text-slate-400 uppercase block">Total Consumed</span>
+                        <span className="text-sm font-black text-cyan-400">
+                          {totalKcal} / {selectedAdminUserDetail.dailyCalorieTarget} kcal
+                        </span>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5">
+                        <span className="text-[10px] text-slate-400 uppercase block">Total Sugar</span>
+                        <span
+                          className={`text-sm font-black ${
+                            totalSugar > selectedAdminUserDetail.dailySugarLimitGrams
+                              ? "text-rose-400"
+                              : "text-amber-400"
+                          }`}
+                        >
+                          {totalSugar}g / max {selectedAdminUserDetail.dailySugarLimitGrams}g
+                        </span>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5">
+                        <span className="text-[10px] text-slate-400 uppercase block">Total Protein</span>
+                        <span className="text-sm font-black text-emerald-400">{totalProtein}g</span>
+                      </div>
+                    </div>
+
+                    {/* Meal list */}
+                    <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                      {userMeals.map((meal: any, idx: number) => (
+                        <div
+                          key={meal.id || idx}
+                          className="p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 flex items-center justify-between text-xs"
+                        >
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-white">{meal.name}</span>
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-white/5 text-slate-400 uppercase">
+                                {meal.mealType || "Meal"}
+                              </span>
+                            </div>
+                            <span className="text-[10px] text-slate-500">
+                              {meal.time || (meal.date ? new Date(meal.date).toLocaleDateString() : "Today")}
+                            </span>
+                          </div>
+
+                          <div className="text-right">
+                            <span className="font-bold text-cyan-400 block">{meal.calories} kcal</span>
+                            <span className="text-[10px] text-slate-400">
+                              P: {meal.protein}g | C: {meal.carbs}g | F: {meal.fat}g | S: {meal.sugar || 0}g
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Modal Actions */}
+            <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+              <button
+                onClick={() => {
+                  setAdminEditingUser(selectedAdminUserDetail);
+                  setAdminEditCalories(String(selectedAdminUserDetail.dailyCalorieTarget));
+                  setAdminEditSugar(String(selectedAdminUserDetail.dailySugarLimitGrams));
+                  setSelectedAdminUserDetail(null);
+                }}
+                className="px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all"
+              >
+                <Sliders className="w-3.5 h-3.5" />
+                Edit Nutrition Targets
+              </button>
+
+              <button
+                onClick={() => setSelectedAdminUserDetail(null)}
+                className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold cursor-pointer transition-all"
+              >
+                Close Profile
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ADMIN EDIT USER NUTRITION TARGETS MODAL */}
+      {adminEditingUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+          <div className="max-w-md w-full rounded-3xl bg-[#090d16] border border-white/20 p-6 shadow-2xl space-y-5">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div>
+                <h3 className="text-base font-bold text-white">Adjust Nutrition Targets</h3>
+                <p className="text-xs text-slate-400">For patient: {adminEditingUser.name} ({adminEditingUser.email})</p>
+              </div>
+              <button
+                onClick={() => setAdminEditingUser(null)}
+                className="p-1.5 rounded-xl bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAdminSaveEditedTargets} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Daily Calorie Target (kcal/day)
+                </label>
+                <input
+                  type="number"
+                  min="800"
+                  max="5000"
+                  required
+                  value={adminEditCalories}
+                  onChange={(e) => setAdminEditCalories(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-white text-xs focus:outline-none focus:border-cyan-400"
+                />
+                <span className="text-[10px] text-slate-500 block mt-1">
+                  Adjust based on patient BMR, goal ({adminEditingUser.goal}), or clinical diet plan.
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Daily Sugar Ceiling (grams/day)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="150"
+                  required
+                  value={adminEditSugar}
+                  onChange={(e) => setAdminEditSugar(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-white text-xs focus:outline-none focus:border-cyan-400"
+                />
+                <span className="text-[10px] text-slate-500 block mt-1">
+                  Diabetic patients should strictly stay below 15g-25g daily added sugars.
+                </span>
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setAdminEditingUser(null)}
+                  className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-slate-950 text-xs font-bold shadow-lg shadow-amber-500/20"
+                >
+                  Save Prescribed Targets
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
