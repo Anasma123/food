@@ -5,7 +5,7 @@
 export interface NutritionalItem {
   id: string;
   name: string;
-  category: "kerala_traditional" | "indian_dishes" | "fruits_veg" | "proteins" | "beverages" | "fast_food" | "packaged";
+  category: "kerala_traditional" | "indian_dishes" | "fruits_veg" | "proteins" | "beverages" | "fast_food" | "packaged" | "grains_pulses" | "global_cuisine";
   imageUrl: string;
   servingSize: string;
   calories: number; // kcal
@@ -21,6 +21,12 @@ export interface NutritionalItem {
   dietRecommendation: string;
   healthyAlternative?: string;
 }
+
+export { COMPREHENSIVE_FOOD_DATABASE } from "./comprehensive-food-database";
+import { COMPREHENSIVE_FOOD_DATABASE } from "./comprehensive-food-database";
+
+export { COMPREHENSIVE_PACKAGED_DATABASE, decodeGS1Prefix, lookupComprehensivePackagedProduct } from "./comprehensive-packaged-database";
+import { COMPREHENSIVE_PACKAGED_DATABASE, decodeGS1Prefix, lookupComprehensivePackagedProduct } from "./comprehensive-packaged-database";
 
 // ----------------------------------------------------------------------------
 // DATASET 1 & 2: ICMR / NIN INDIAN & KERALA FOOD COMPOSITION DATASET (IFCT)
@@ -386,6 +392,215 @@ export const INDIAN_NUTRITION_DATASET: NutritionalItem[] = [
     safeForDiabetic: true,
     dietRecommendation: "High in potassium (422mg) and vitamin B6. Natural pre-workout energy fuel; moderate portion for strict low-carb diets.",
     healthyAlternative: "Steam raw green banana for prebiotic resistant starch that feeds gut microbiome."
+  },
+  {
+    id: "in_20",
+    name: "Karimeen Pollichathu (Pearl Spot in Banana Leaf)",
+    category: "kerala_traditional",
+    imageUrl: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=600&q=80",
+    servingSize: "1 whole fish (220g)",
+    calories: 250,
+    sugar: 1.2,
+    protein: 32.0,
+    carbs: 5.4,
+    fat: 11.2,
+    fiber: 1.8,
+    glycemicIndex: 15,
+    allergens: ["Fish"],
+    healthScore: 95,
+    safeForDiabetic: true,
+    dietRecommendation: "Kerala backwater delicacy wrapped in charred banana leaf. Exceptionally rich in lean protein, omega-3 fatty acids, and antioxidant shallot masala.",
+    healthyAlternative: "Cook with cold-pressed coconut oil on a cast-iron tawa for best heart-healthy lipids."
+  },
+  {
+    id: "in_21",
+    name: "Kappa & Meen Curry (Tapioca with Red Fish Curry)",
+    category: "kerala_traditional",
+    imageUrl: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=600&q=80",
+    servingSize: "1 bowl mashed tapioca (180g) + fish curry (120g)",
+    calories: 460,
+    sugar: 1.5,
+    protein: 22.0,
+    carbs: 88.0,
+    fat: 6.2,
+    fiber: 5.4,
+    glycemicIndex: 70,
+    allergens: ["Fish"],
+    healthScore: 72,
+    safeForDiabetic: false,
+    dietRecommendation: "Tapioca (Kappa) has a high glycemic index and starchy load. The spicy kudampuli fish curry helps protein balance, but diabetic individuals should restrict kappa portion.",
+    healthyAlternative: "Replace half the tapioca with steamed raw plantain (nendrakkaya) or cabbage thoran."
+  },
+  {
+    id: "in_22",
+    name: "Thalassery Mutton Biryani (Khaima Rice)",
+    category: "kerala_traditional",
+    imageUrl: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80",
+    servingSize: "1 plate (380g) with raita",
+    calories: 740,
+    sugar: 3.8,
+    protein: 36.5,
+    carbs: 74.0,
+    fat: 33.0,
+    fiber: 3.5,
+    glycemicIndex: 65,
+    allergens: ["Dairy (Ghee)", "Cashews"],
+    healthScore: 54,
+    safeForDiabetic: false,
+    dietRecommendation: "Iconic Malabar feast dish cooked with aromatic Jeerakasala rice, pure ghee, and tender mutton. High caloric and saturated fat density.",
+    healthyAlternative: "Pair with double serving of onion-mint curd salad and drink warm lemon water or sulaimani."
+  },
+  {
+    id: "in_23",
+    name: "Kerala Sadya Avial (Mixed Veggies in Coconut Curd)",
+    category: "kerala_traditional",
+    imageUrl: "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=600&q=80",
+    servingSize: "1 cup (150g)",
+    calories: 165,
+    sugar: 4.2,
+    protein: 3.8,
+    carbs: 16.0,
+    fat: 9.8,
+    fiber: 6.5,
+    glycemicIndex: 38,
+    allergens: ["Coconut", "Dairy (Curd)"],
+    healthScore: 96,
+    safeForDiabetic: true,
+    dietRecommendation: "Nutritional crown jewel of Kerala Sadya containing 8+ indigenous vegetables (drumstick, raw banana, elephant yam, snake gourd, carrots) cooked in fresh curd and raw coconut oil.",
+    healthyAlternative: "Already a perfect functional food. Keep raw virgin coconut oil drizzle unheated."
+  },
+  {
+    id: "in_24",
+    name: "Mathi Fry (Crispy Sardines with Curry Leaves)",
+    category: "kerala_traditional",
+    imageUrl: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=600&q=80",
+    servingSize: "3 small sardines (150g)",
+    calories: 220,
+    sugar: 0.1,
+    protein: 28.5,
+    carbs: 2.2,
+    fat: 10.8,
+    fiber: 0.8,
+    glycemicIndex: 0,
+    allergens: ["Fish"],
+    healthScore: 97,
+    safeForDiabetic: true,
+    dietRecommendation: "Superfood of coastal Kerala! Packed with bioavailable calcium, EPA/DHA omega-3 fatty acids, and vitamin D. Promotes cardiovascular health and brain function.",
+    healthyAlternative: "Pan-sear or air-fry with chili powder, turmeric, and curry leaves rather than deep oil frying."
+  },
+  {
+    id: "in_25",
+    name: "Sambharam / Kerala Moru (Spiced Buttermilk)",
+    category: "beverages",
+    imageUrl: "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=600&q=80",
+    servingSize: "1 tall glass (250ml)",
+    calories: 45,
+    sugar: 3.2,
+    protein: 2.8,
+    carbs: 3.5,
+    fat: 1.8,
+    fiber: 0.4,
+    glycemicIndex: 20,
+    allergens: ["Dairy"],
+    healthScore: 98,
+    safeForDiabetic: true,
+    dietRecommendation: "Nature's probiotic cooler made with churned curd, crushed bird's eye chili (kanthari), ginger, curry leaves, and asafoetida. Excellent gut flora booster and post-meal digestive.",
+    healthyAlternative: "Top choice as is! Use rock salt (pink Himalayan) for balanced electrolytes."
+  },
+  {
+    id: "in_26",
+    name: "Kulukki Sarbath (Kerala Shaken Lemon Cooler)",
+    category: "beverages",
+    imageUrl: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80",
+    servingSize: "1 glass (300ml)",
+    calories: 110,
+    sugar: 23.5,
+    protein: 0.8,
+    carbs: 26.0,
+    fat: 0.2,
+    fiber: 2.1,
+    glycemicIndex: 65,
+    allergens: [],
+    healthScore: 52,
+    safeForDiabetic: false,
+    dietRecommendation: "Street favorite with lemon, green chili slit, and sabja seeds (sweet basil seeds). While basil seeds provide gut cooling, high sugar syrup spikes insulin.",
+    healthyAlternative: "Request 'Panchasara illaathe' (without sugar) or use pure honey / stevia with sabja seeds."
+  },
+  {
+    id: "in_27",
+    name: "Ela Ada (Steamed Rice Parcels with Jaggery)",
+    category: "kerala_traditional",
+    imageUrl: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=600&q=80",
+    servingSize: "1 ada (110g)",
+    calories: 235,
+    sugar: 21.0,
+    protein: 3.2,
+    carbs: 47.0,
+    fat: 4.5,
+    fiber: 2.8,
+    glycemicIndex: 62,
+    allergens: ["Coconut"],
+    healthScore: 66,
+    safeForDiabetic: false,
+    dietRecommendation: "Steamed delicacy prepared in banana leaf with rice dough stuffed with coconut and organic jaggery (sharkara). Chemical-free traditional treat, but watch glycemic load.",
+    healthyAlternative: "Use Ragi (Finger Millet) flour for the outer layer and sweeten with mashed cardamom banana."
+  },
+  {
+    id: "in_28",
+    name: "Beef Ularthiyathu (Kerala Beef Dry Fry)",
+    category: "kerala_traditional",
+    imageUrl: "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=600&q=80",
+    servingSize: "1 plate (160g)",
+    calories: 340,
+    sugar: 1.0,
+    protein: 38.0,
+    carbs: 4.5,
+    fat: 19.0,
+    fiber: 1.9,
+    glycemicIndex: 12,
+    allergens: ["Coconut"],
+    healthScore: 74,
+    safeForDiabetic: true,
+    dietRecommendation: "Slow-roasted tender beef chunks tossed with coconut slivers (thenga kothu), black pepper, and fennel. Zero carb spike with high iron and muscle-building protein.",
+    healthyAlternative: "Drain excess oil when pan-roasting; pair with fiber-rich cucumber or cabbage salad."
+  },
+  {
+    id: "in_29",
+    name: "Pathiri (3 pcs) with Nadan Chicken Gravy",
+    category: "kerala_traditional",
+    imageUrl: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80",
+    servingSize: "3 soft pathiris (100g) + chicken curry (150g)",
+    calories: 385,
+    sugar: 2.0,
+    protein: 24.5,
+    carbs: 54.0,
+    fat: 8.8,
+    fiber: 2.4,
+    glycemicIndex: 63,
+    allergens: [],
+    healthScore: 82,
+    safeForDiabetic: true,
+    dietRecommendation: "Ultra-thin roasted rice flour crepes popular across Malabar. Gluten-free and very easy to digest.",
+    healthyAlternative: "Pair with coconut-milk infused light chicken stew or spicy egg roast."
+  },
+  {
+    id: "in_30",
+    name: "Kadala Curry (Black Chickpeas in Roasted Gravy)",
+    category: "kerala_traditional",
+    imageUrl: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=600&q=80",
+    servingSize: "1 bowl (180g)",
+    calories: 230,
+    sugar: 2.8,
+    protein: 11.5,
+    carbs: 34.0,
+    fat: 6.2,
+    fiber: 8.8,
+    glycemicIndex: 32,
+    allergens: ["Coconut"],
+    healthScore: 94,
+    safeForDiabetic: true,
+    dietRecommendation: "Black chickpeas (kala chana) roasted with theeyal spices and coconut. Phenomenal low-GI resistant starch, sustaining energy for 4-5 hours without sugar spikes.",
+    healthyAlternative: "Outstanding standalone healthy breakfast protein with puttu or appam."
   }
 ];
 
@@ -705,6 +920,211 @@ export const PACKAGED_PRODUCTS_DATASET: PackagedProduct[] = [
     healthWarnings: ["High palm oil content (33.6% fat)", "Deep fried at high temperatures forming acrylamide"]
   },
   {
+    barcode: "8901491101844",
+    brand: "Lay's",
+    productName: "Lay's American Style Cream & Onion Potato Chips",
+    category: "Snacks",
+    imageUrl: "https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "E",
+    novaGroup: 4,
+    sugarPer100g: 4.5,
+    caloriesPer100g: 546,
+    fatPer100g: 33.8,
+    saltPer100g: 2.2,
+    ingredients: [
+      "Potato",
+      "Edible Vegetable Oil (Palmolein)",
+      "Seasoning (Milk Solids, Sugar, Salt, Onion Powder, Cheese Powder)",
+      "Flavour Enhancers (INS 627, INS 631)",
+      "Acidity Regulators (INS 330, INS 270)"
+    ],
+    additives: ["E627", "E631", "E330", "E270"],
+    isUltraProcessed: true,
+    harmfulAdditivesDetected: [
+      "E627 & E631 Synthetic Umami Boosters (INS 627/631)",
+      "Heavily refined Palmolein oil (33.8% saturated fat)"
+    ],
+    healthWarnings: [
+      "High palm oil saturated lipid content",
+      "Synthetic chemical flavor enhancers compound metabolic load"
+    ]
+  },
+  {
+    barcode: "8901491001021",
+    brand: "Lay's",
+    productName: "Lay's Classic Salted Potato Chips",
+    category: "Snacks",
+    imageUrl: "https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "D",
+    novaGroup: 4,
+    sugarPer100g: 0.8,
+    caloriesPer100g: 542,
+    fatPer100g: 33.5,
+    saltPer100g: 1.8,
+    ingredients: ["Potato", "Edible Vegetable Oil (Palmolein)", "Iodised Salt (1.8%)"],
+    additives: [],
+    isUltraProcessed: true,
+    harmfulAdditivesDetected: ["Palmolein refined vegetable fat fraction"],
+    healthWarnings: ["Deep-fried at extreme industrial temps forming acrylamides", "33.5% fat from cheap palm fractions"]
+  },
+  {
+    barcode: "5000159483321",
+    brand: "Pringles",
+    productName: "Pringles Original Potato Crisps",
+    category: "Snacks",
+    imageUrl: "https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "E",
+    novaGroup: 4,
+    sugarPer100g: 1.2,
+    caloriesPer100g: 536,
+    fatPer100g: 31.0,
+    saltPer100g: 1.4,
+    ingredients: [
+      "Dehydrated Potatoes (42%)",
+      "Sunflower Oil",
+      "Wheat Starch",
+      "Corn Flour",
+      "Rice Flour",
+      "Emulsifier (INS 471)",
+      "Maltodextrin",
+      "Salt"
+    ],
+    additives: ["E471"],
+    isUltraProcessed: true,
+    harmfulAdditivesDetected: [
+      "Maltodextrin (Extreme Glycemic Index 110-130)",
+      "E471 (Mono- and diglycerides of fatty acids)"
+    ],
+    healthWarnings: ["Reconstituted starch dough rather than whole sliced potato", "High glycemic load"]
+  },
+  {
+    barcode: "8901138510015",
+    brand: "Bingo! (ITC)",
+    productName: "Bingo! Tedhe Medhe Masala Tadka",
+    category: "Snacks",
+    imageUrl: "https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "E",
+    novaGroup: 4,
+    sugarPer100g: 2.5,
+    caloriesPer100g: 558,
+    fatPer100g: 36.0,
+    saltPer100g: 2.6,
+    ingredients: [
+      "Rice Meal",
+      "Edible Vegetable Oil (Palmolein)",
+      "Corn Meal",
+      "Gram Meal",
+      "Spices & Condiments",
+      "Flavour Enhancers (INS 627, INS 631)"
+    ],
+    additives: ["E627", "E631"],
+    isUltraProcessed: true,
+    harmfulAdditivesDetected: ["INS 627 & INS 631 chemical enhancers", "Refined Palmolein oil"],
+    healthWarnings: ["Hazardous sodium load (2.6g salt/100g)", "Deep fried in palmolein"]
+  },
+  {
+    barcode: "8906033770209",
+    brand: "The Whole Truth",
+    productName: "The Whole Truth Vacuum-Fried Sweet Potato Chips",
+    category: "Snacks",
+    imageUrl: "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "A",
+    novaGroup: 1,
+    sugarPer100g: 4.2,
+    caloriesPer100g: 395,
+    fatPer100g: 11.8,
+    saltPer100g: 0.5,
+    ingredients: ["Fresh Sweet Potato (85%)", "Cold-Pressed Groundnut Oil (14%)", "Himalayan Pink Rock Salt (1%)"],
+    additives: [],
+    isUltraProcessed: false,
+    harmfulAdditivesDetected: [],
+    healthWarnings: ["Clean label: Zero Palm Oil, Zero Preservatives, 70% Less Oil via low-temp vacuum frying."]
+  },
+  {
+    barcode: "8906123450012",
+    brand: "Farmley",
+    productName: "Farmley Slow-Roasted Himalayan Salt Makhana (Foxnuts)",
+    category: "Snacks",
+    imageUrl: "https://images.unsplash.com/photo-1599490659213-e2b9527bd087?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "A",
+    novaGroup: 1,
+    sugarPer100g: 0.5,
+    caloriesPer100g: 348,
+    fatPer100g: 1.2,
+    saltPer100g: 0.4,
+    ingredients: ["Foxnuts / Phool Makhana (97%)", "Cold-Pressed Olive Oil (2%)", "Himalayan Pink Rock Salt (1%)"],
+    additives: [],
+    isUltraProcessed: false,
+    harmfulAdditivesDetected: [],
+    healthWarnings: ["Clean label: 100% Non-fried, Zero Palm Oil, Rich in Plant Protein (9.7g) & Calcium."]
+  },
+  {
+    barcode: "8908012345019",
+    brand: "Beyond Snack",
+    productName: "Beyond Snack Air-Cooked Kerala Raw Banana Chips",
+    category: "Snacks",
+    imageUrl: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "A",
+    novaGroup: 2,
+    sugarPer100g: 1.8,
+    caloriesPer100g: 412,
+    fatPer100g: 13.5,
+    saltPer100g: 0.6,
+    ingredients: ["Kerala Nendran Raw Bananas (85%)", "100% Pure Virgin Coconut Oil (13%)", "Rock Salt & Black Pepper (2%)"],
+    additives: [],
+    isUltraProcessed: false,
+    harmfulAdditivesDetected: [],
+    healthWarnings: ["Clean label: Cooked in Pure Virgin Coconut Oil, Zero Palm Oil, Zero Synthetic Flavor Enhancers."]
+  },
+  {
+    barcode: "8906107380029",
+    brand: "Slurrp Farm",
+    productName: "Slurrp Farm 100% Baked Ragi & Beetroot Millet Crunchies",
+    category: "Snacks",
+    imageUrl: "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "A",
+    novaGroup: 2,
+    sugarPer100g: 2.1,
+    caloriesPer100g: 365,
+    fatPer100g: 4.8,
+    saltPer100g: 0.5,
+    ingredients: [
+      "Finger Millet (Ragi Flour 35%)",
+      "Sorghum (Jowar Flour 30%)",
+      "Rice Flour (20%)",
+      "Cold-Pressed Sunflower Oil (10%)",
+      "Natural Beetroot Powder",
+      "Rock Salt & Seasoning"
+    ],
+    additives: [],
+    isUltraProcessed: false,
+    harmfulAdditivesDetected: [],
+    healthWarnings: ["Clean label: 100% Baked Whole Millets, Zero Palm Oil, Zero Maida, Zero Synthetic Additives."]
+  },
+  {
+    barcode: "8908009876543",
+    brand: "TagZ Foods",
+    productName: "TagZ Foods Italian Cheese Popped Potato Chips (Never Fried)",
+    category: "Snacks",
+    imageUrl: "https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "B",
+    novaGroup: 3,
+    sugarPer100g: 2.4,
+    caloriesPer100g: 430,
+    fatPer100g: 14.5,
+    saltPer100g: 1.1,
+    ingredients: [
+      "Dried Potato Flakes (70%)",
+      "Corn Starch",
+      "High-Oleic Sunflower Oil (14%)",
+      "Natural Cheese Seasoning (Cheddar Powder, Onion, Garlic, Salt)"
+    ],
+    additives: [],
+    isUltraProcessed: false,
+    harmfulAdditivesDetected: [],
+    healthWarnings: ["Popped under intense pressure & heat: 50% less fat than standard potato chips, Zero Palm Oil, Zero added MSG."]
+  },
+  {
     barcode: "8901262010048",
     brand: "Amul",
     productName: "Amul Pasteurised Butter",
@@ -721,6 +1141,204 @@ export const PACKAGED_PRODUCTS_DATASET: PackagedProduct[] = [
     isUltraProcessed: false,
     harmfulAdditivesDetected: [],
     healthWarnings: ["High saturated fat - use in measured portions", "Contains common salt"]
+  },
+  {
+    barcode: "8901063142275",
+    brand: "Britannia",
+    productName: "Good Day Cashew & Butter Cookies",
+    category: "Biscuits",
+    imageUrl: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "E",
+    novaGroup: 4,
+    sugarPer100g: 22.0,
+    caloriesPer100g: 490,
+    fatPer100g: 22.5,
+    saltPer100g: 0.6,
+    ingredients: ["Refined Wheat Flour (Maida)", "Sugar", "Refined Palm Oil", "Cashew Nuts (4.5%)", "Butter", "Invert Sugar Syrup", "Raising Agents (E503ii, E500ii)", "Artificial Flavouring"],
+    additives: ["E503ii", "E500ii", "Artificial Flavouring"],
+    isUltraProcessed: true,
+    harmfulAdditivesDetected: ["Invert sugar syrup (High glycemic payload)", "Refined Palm Oil"],
+    healthWarnings: ["22% refined sugar payload", "High saturated fats from palmolein"]
+  },
+  {
+    barcode: "8901491102018",
+    brand: "Kurkure",
+    productName: "Kurkure Masala Munch (Chatpata)",
+    category: "Snacks",
+    imageUrl: "https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "E",
+    novaGroup: 4,
+    sugarPer100g: 2.1,
+    caloriesPer100g: 561,
+    fatPer100g: 35.8,
+    saltPer100g: 2.9,
+    ingredients: ["Rice Meal", "Edible Vegetable Oil (Palmolein)", "Corn Meal", "Gram Meal", "Spices and Condiments", "Acidity Regulator (INS 330)", "Flavour Enhancer (INS 627, INS 631)"],
+    additives: ["E330", "E627", "E631"],
+    isUltraProcessed: true,
+    harmfulAdditivesDetected: ["INS 627 & INS 631 (Synthetic Disodium Guanylate & Inosinate)", "Refined Palmolein oil"],
+    healthWarnings: ["Hazardous sodium load (2.9g salt/100g)", "Heavily fried in palmolein"]
+  },
+  {
+    barcode: "8901233024821",
+    brand: "Dabur Real",
+    productName: "Real Fruit Power Mixed Fruit Juice (1L)",
+    category: "Beverages",
+    imageUrl: "https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "E",
+    novaGroup: 4,
+    sugarPer100g: 13.0,
+    caloriesPer100g: 56,
+    fatPer100g: 0.0,
+    saltPer100g: 0.05,
+    ingredients: ["Water", "Mixed Fruit Juice Concentrate", "Sugar (Added)", "Acidity Regulator (INS 330)", "Antioxidant (INS 300)"],
+    additives: ["E330", "E300"],
+    isUltraProcessed: true,
+    harmfulAdditivesDetected: ["High concentrated liquid fructose payload (Rapid liver fatty stress)"],
+    healthWarnings: ["Stripped of natural dietary fiber", "Over 13g free sugar per 100ml"]
+  },
+  {
+    barcode: "8906001020015",
+    brand: "Paper Boat",
+    productName: "Pure Tender Coconut Water (No Added Sugar)",
+    category: "Beverages",
+    imageUrl: "https://images.unsplash.com/photo-1544681280-d25a782adc9b?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "A",
+    novaGroup: 1,
+    sugarPer100g: 4.2,
+    caloriesPer100g: 19,
+    fatPer100g: 0.1,
+    saltPer100g: 0.05,
+    ingredients: ["100% Tender Coconut Water", "Bio-antioxidant (INS 300 Vitamin C)"],
+    additives: ["E300"],
+    isUltraProcessed: false,
+    harmfulAdditivesDetected: [],
+    healthWarnings: ["None. 100% clean natural isotonic electrolytes"]
+  },
+  {
+    barcode: "8906107380012",
+    brand: "Slurrp Farm",
+    productName: "Slurrp Farm Foxtail Millet Hakka Noodles",
+    category: "Instant Noodles",
+    imageUrl: "https://images.unsplash.com/photo-1612927601601-6638404737ce?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "A",
+    novaGroup: 2,
+    sugarPer100g: 0.8,
+    caloriesPer100g: 350,
+    fatPer100g: 1.8,
+    saltPer100g: 0.4,
+    ingredients: ["Foxtail Millet Flour (40%)", "Whole Wheat Flour (60%)", "Cluster Bean Powder"],
+    additives: [],
+    isUltraProcessed: false,
+    harmfulAdditivesDetected: [],
+    healthWarnings: ["None. Sun-dried, not fried in palm oil. Zero MSG or E635"]
+  },
+  {
+    barcode: "7622201755101",
+    brand: "Cadbury",
+    productName: "Dairy Milk Milk Chocolate Bar",
+    category: "Confectionery",
+    imageUrl: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "E",
+    novaGroup: 4,
+    sugarPer100g: 57.0,
+    caloriesPer100g: 532,
+    fatPer100g: 30.5,
+    saltPer100g: 0.4,
+    ingredients: ["Sugar", "Milk Solids (22%)", "Cocoa Butter", "Cocoa Solids", "Emulsifiers (INS 442, INS 476)", "Flavours (Natural & Nature Identical)"],
+    additives: ["E442", "E476"],
+    isUltraProcessed: true,
+    harmfulAdditivesDetected: ["57% pure refined sugar by weight", "E476 (Polyglycerol polyricinoleate)"],
+    healthWarnings: ["Severe insulin spike", "Very high calorie density"]
+  },
+  {
+    barcode: "8906033770117",
+    brand: "The Whole Truth",
+    productName: "The Whole Truth Rolled Oats & Almonds Bar",
+    category: "Snacks",
+    imageUrl: "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "A",
+    novaGroup: 1,
+    sugarPer100g: 8.5,
+    caloriesPer100g: 380,
+    fatPer100g: 12.0,
+    saltPer100g: 0.1,
+    ingredients: ["Dates", "Whole Rolled Oats", "Almonds", "Raw Cocoa", "Coconut Butter"],
+    additives: [],
+    isUltraProcessed: false,
+    harmfulAdditivesDetected: [],
+    healthWarnings: ["None. Zero added sugar, zero preservatives, 100% whole foods"]
+  },
+  {
+    barcode: "8901233005891",
+    brand: "Cadbury / Mondelez",
+    productName: "Bournvita Chocolate Health Food Drink (500g)",
+    category: "Health Drinks",
+    imageUrl: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "E",
+    novaGroup: 4,
+    sugarPer100g: 37.4,
+    caloriesPer100g: 395,
+    fatPer100g: 1.8,
+    saltPer100g: 0.35,
+    ingredients: ["Cereal Extracts (56%)", "Sugar", "Cocoa Solids", "Caramel Colour (INS 150c)", "Liquid Glucose", "Emulsifiers (INS 322, INS 471)", "Raising Agent (INS 500ii)"],
+    additives: ["E150c", "E322", "E471", "E500ii"],
+    isUltraProcessed: true,
+    harmfulAdditivesDetected: ["Liquid Glucose & Invert Sugar (Rapid blood glucose spike)", "37.4% added and natural sugars"],
+    healthWarnings: ["High sugar payload advertised to children as a health booster", "E150c chemical coloring"]
+  },
+  {
+    barcode: "8901030022341",
+    brand: "Kissan (HUL)",
+    productName: "Kissan Fresh Tomato Ketchup (500g)",
+    category: "Condiments",
+    imageUrl: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "E",
+    novaGroup: 4,
+    sugarPer100g: 27.5,
+    caloriesPer100g: 120,
+    fatPer100g: 0.1,
+    saltPer100g: 2.1,
+    ingredients: ["Water", "Tomato Paste (28%)", "Sugar", "Salt", "Acidity Regulator (INS 260)", "Thickeners (INS 1422, INS 415)", "Preservative (INS 211)", "Spices & Condiments"],
+    additives: ["E260", "E1422", "E415", "E211"],
+    isUltraProcessed: true,
+    harmfulAdditivesDetected: ["INS 211 (Sodium Benzoate) - can form benzene when combined with Vitamin C", "Excessive added refined sugar (27.5%)"],
+    healthWarnings: ["Over 25% refined cane sugar disguised in savory sauce", "Sodium benzoate preservative load"]
+  },
+  {
+    barcode: "7622201732003",
+    brand: "Cadbury Oreo",
+    productName: "Oreo Vanilla Creme Sandwich Biscuits",
+    category: "Biscuits",
+    imageUrl: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "E",
+    novaGroup: 4,
+    sugarPer100g: 38.5,
+    caloriesPer100g: 485,
+    fatPer100g: 19.5,
+    saltPer100g: 1.1,
+    ingredients: ["Refined Wheat Flour (Maida)", "Sugar", "Fractionated Palm Oil", "Invert Sugar", "Cocoa Solids (2.3%)", "Raising Agents (INS 500ii, INS 503ii)", "Salt", "Emulsifier (INS 322)", "Vanillin"],
+    additives: ["E500ii", "E503ii", "E322"],
+    isUltraProcessed: true,
+    harmfulAdditivesDetected: ["Fractionated Palm Oil with saturated fat", "Invert Sugar + Refined Sugar combo (38.5% total sugar)"],
+    healthWarnings: ["High glycemic index maida + palm oil + sugar formula", "Dental caries and metabolic stress"]
+  },
+  {
+    barcode: "8901030383181",
+    brand: "Aashirvaad (ITC)",
+    productName: "Aashirvaad Superior MP Sharbati Whole Wheat Atta",
+    category: "Staples",
+    imageUrl: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80",
+    nutriscoreGrade: "A",
+    novaGroup: 1,
+    sugarPer100g: 0.0,
+    caloriesPer100g: 360,
+    fatPer100g: 1.7,
+    saltPer100g: 0.02,
+    ingredients: ["100% Whole Wheat Grains (Sharbati)"],
+    additives: [],
+    isUltraProcessed: false,
+    harmfulAdditivesDetected: [],
+    healthWarnings: ["None. 100% clean stone-ground whole wheat with natural dietary bran and germ."]
   }
 ];
 
@@ -1229,70 +1847,230 @@ export const KNOWN_IMAGE_FOOD_MAP: Record<string, string> = {
 
 // Aliases mapping common search terms (including Malayalam/Indian names) to food search keywords
 const FOOD_ALIASES: Record<string, string[]> = {
-  apple: ["fresh red apple", "fresh green apple", "apple"],
-  chaya: ["kerala milk tea", "kattan chaya", "tea"],
-  tea: ["kerala milk tea", "kattan chaya"],
-  coffee: ["hot filter coffee", "black coffee"],
-  kaapi: ["hot filter coffee", "black coffee"],
-  rice: ["boiled rice (choru / kerala matta rice)", "choru", "rice"],
-  choru: ["boiled rice (choru / kerala matta rice)", "rice"],
-  puttu: ["kerala puttu with kadala curry"],
-  biryani: ["malabar chicken dum biryani"],
-  porotta: ["kerala porotta with beef roast"],
-  parotta: ["kerala porotta with beef roast"],
-  egg: ["boiled eggs", "egg roast"],
-  mutta: ["egg roast", "boiled eggs"],
-  chicken: ["kerala chicken curry", "malabar chicken dum biryani", "grilled chicken breast"],
-  kozhi: ["kerala chicken curry", "malabar chicken dum biryani"],
-  fish: ["kerala fish curry", "meen curry"],
-  meen: ["kerala fish curry"],
-  banana: ["ripe banana", "pazham pori"],
-  pazham: ["ripe banana", "pazham pori"],
-  orange: ["fresh orange / sweet citrus"],
-  dosa: ["masala dosa with sambar"],
-  idli: ["idli (2 pcs) with sambar & coconut chutney"],
-  chapati: ["whole wheat chapati"],
-  roti: ["whole wheat chapati"],
-  dal: ["parippu / dal curry with ghee"],
-  parippu: ["parippu / dal curry with ghee"],
-  sambar: ["sambar (south indian lentil & vegetable stew)"],
-  salad: ["fresh garden salad with olive oil"],
-  yogurt: ["plain greek yogurt / curd"],
-  curd: ["plain greek yogurt / curd"]
+  apple: ["apple"],
+  chaya: ["chaya", "tea"],
+  tea: ["chaya", "tea"],
+  coffee: ["coffee", "kaapi"],
+  kaapi: ["coffee", "kaapi"],
+  rice: ["choru", "matta rice", "rice"],
+  choru: ["choru", "matta rice", "rice"],
+  puttu: ["puttu", "kadala"],
+  biryani: ["biryani", "dum biryani", "briyani"],
+  porotta: ["porotta", "parotta", "beef roast"],
+  parotta: ["porotta", "parotta"],
+  egg: ["egg", "mutta"],
+  mutta: ["egg", "mutta"],
+  chicken: ["chicken", "kozhi"],
+  kozhi: ["chicken", "kozhi"],
+  fish: ["fish", "meen", "ayala", "neymeen", "mathi"],
+  meen: ["fish", "meen", "ayala", "neymeen"],
+  banana: ["banana", "pazham", "nendran"],
+  pazham: ["pazham", "banana", "nendran"],
+  orange: ["orange", "citrus"],
+  dosa: ["dosa", "dosha"],
+  idli: ["idli", "idly"],
+  chapati: ["chapati", "roti", "phulka"],
+  roti: ["roti", "chapati"],
+  dal: ["dal", "parippu"],
+  parippu: ["parippu", "dal"],
+  sambar: ["sambar"],
+  salad: ["salad", "cucumber", "garden salad"],
+  yogurt: ["yogurt", "curd", "moru"],
+  curd: ["curd", "yogurt"],
+  moru: ["moru", "sambharam", "buttermilk"],
+  pizza: ["pizza"],
+  burger: ["burger"],
+  pasta: ["pasta"],
+  fries: ["fries", "potato"],
+  chips: ["chips", "lay's", "banana chips", "snack"],
+  potato: ["potato", "chips", "lay's"],
+  lays: ["lay's", "chips"],
+  noodles: ["noodles", "maggi", "hakka", "yippee"],
+  maggi: ["maggi", "noodles"],
+  samosa: ["samosa"],
+  shawarma: ["shawarma", "wrap"],
+  beef: ["beef", "beef roast", "beef fry"],
+  mutton: ["mutton"],
+  paneer: ["paneer"],
+  oats: ["oats", "porridge"],
+  upma: ["upma", "uppumavu"],
+  appam: ["appam", "palappam", "stew"],
+  idiyappam: ["idiyappam", "noolappam"],
+  kanji: ["kanji", "payar"],
+  payasam: ["payasam", "pradhaman"],
+  juice: ["juice", "tender coconut"],
+  shake: ["smoothie", "shake"],
+  soup: ["soup"]
 };
 
-// Helper Function: Find food by text query across all datasets with alias intelligence
+// Helper Function: Complete trained food database
+export const ALL_NUTRITIONAL_DATASET = COMPREHENSIVE_FOOD_DATABASE;
+
+// Helper Function: Find food by text query across all datasets with alias intelligence and token scoring
 export function searchNutritionalDatasets(query: string): NutritionalItem[] {
   const q = query.toLowerCase().trim();
   if (!q) return [];
-  const all = [...INDIAN_NUTRITION_DATASET, ...USDA_GLOBAL_DATASET];
+  const all = COMPREHENSIVE_FOOD_DATABASE;
 
   // 1. Direct exact or substring match in food name
   const directMatches = all.filter(item => item.name.toLowerCase().includes(q));
   if (directMatches.length > 0) return directMatches;
 
-  // 2. Alias matching (e.g. apple -> "Fresh Red Apple", chaya -> "Kerala Milk Tea", coffee -> "Hot Filter Coffee")
+  // 2. Token-based word match (handles queries like "lays chips", "potato chips", "maggi noodles", "kerala biryani")
+  const stopwords = new Set(["the", "with", "and", "for", "from", "style", "fresh", "hot", "pure"]);
+  const tokens = q.split(/[\s_\-/,]+/).map(t => t.trim()).filter(t => t.length >= 3 && !stopwords.has(t));
+
+  if (tokens.length > 0) {
+    const scoredMatches: { item: NutritionalItem; score: number }[] = [];
+    for (const item of all) {
+      const nameL = item.name.toLowerCase();
+      const catL = item.category.toLowerCase();
+      let score = 0;
+      for (const token of tokens) {
+        if (nameL.includes(token)) score += 3;
+        else if (catL.includes(token)) score += 1;
+      }
+      if (score > 0) {
+        scoredMatches.push({ item, score });
+      }
+    }
+    if (scoredMatches.length > 0) {
+      scoredMatches.sort((a, b) => b.score - a.score);
+      return scoredMatches.map(s => s.item);
+    }
+  }
+
+  // 3. Alias keyword matching
   for (const [aliasKey, targetKeywords] of Object.entries(FOOD_ALIASES)) {
     if (q.includes(aliasKey) || aliasKey.includes(q)) {
-      const aliasMatches = all.filter(item => 
-        targetKeywords.some(keyword => item.name.toLowerCase().includes(keyword))
-      );
+      const aliasMatches = all.filter(item => {
+        const n = item.name.toLowerCase();
+        return targetKeywords.some(keyword => n.includes(keyword));
+      });
       if (aliasMatches.length > 0) return aliasMatches;
     }
   }
 
-  // 3. Category or description match
+  // 4. Check Packaged Products Dataset and wrap as NutritionalItem if matched
+  const packagedMatch = PACKAGED_PRODUCTS_DATASET.find(p => 
+    p.productName.toLowerCase().includes(q) || 
+    p.brand.toLowerCase().includes(q) ||
+    tokens.some(t => p.productName.toLowerCase().includes(t) || p.brand.toLowerCase().includes(t))
+  );
+  if (packagedMatch) {
+    return [{
+      id: packagedMatch.barcode,
+      name: `${packagedMatch.brand} ${packagedMatch.productName}`,
+      category: "packaged_food",
+      imageUrl: packagedMatch.imageUrl,
+      servingSize: "100g",
+      calories: packagedMatch.caloriesPer100g,
+      sugar: packagedMatch.sugarPer100g,
+      protein: 6.5,
+      carbs: 58.0,
+      fat: packagedMatch.fatPer100g,
+      fiber: 2.5,
+      glycemicIndex: packagedMatch.sugarPer100g > 15 ? 75 : 55,
+      allergens: [],
+      healthScore: Math.round(packagedMatch.truthInScore * 20),
+      safeForDiabetic: packagedMatch.sugarPer100g <= 5,
+      dietRecommendation: packagedMatch.healthWarnings.join(". ") || "Packaged food item.",
+      healthyAlternative: "Choose fresh whole food alternatives."
+    }];
+  }
+
+  // 5. Category or description match
   return all.filter(item => 
     item.category.toLowerCase().includes(q) || 
     item.dietRecommendation.toLowerCase().includes(q)
   );
 }
 
+// Helper Function: Find or generate an actual high-quality NutritionalItem as healthy alternative
+export function findHealthyAlternativeForMeal(item: NutritionalItem): NutritionalItem {
+  const all = COMPREHENSIVE_FOOD_DATABASE;
+  const nameLower = item.name.toLowerCase();
+
+  // If already top tier health score, return an optimized whole-food pairing
+  if (item.healthScore >= 92 && item.sugar <= 5 && item.glycemicIndex <= 50) {
+    const complement = all.find(f => f.category === "fruits_veg" && f.id !== item.id);
+    return complement || item;
+  }
+
+  // 1. Specific dish mappings
+  if (nameLower.includes("biryani") || nameLower.includes("fried rice") || nameLower.includes("mandhi")) {
+    const match = all.find(f => f.name.toLowerCase().includes("quinoa") || f.name.toLowerCase().includes("brown rice") || f.name.toLowerCase().includes("grilled chicken"));
+    if (match) return match;
+  }
+
+  if (nameLower.includes("porotta") || nameLower.includes("parotta") || nameLower.includes("naan") || nameLower.includes("bhatura")) {
+    const match = all.find(f => f.name.toLowerCase().includes("chapati") || f.name.toLowerCase().includes("ragi puttu") || f.name.toLowerCase().includes("multigrain"));
+    if (match) return match;
+  }
+
+  if (nameLower.includes("pazham pori") || nameLower.includes("samosa") || nameLower.includes("pakora") || nameLower.includes("fry")) {
+    const match = all.find(f => f.name.toLowerCase().includes("steamed nendran") || f.name.toLowerCase().includes("makhana") || f.name.toLowerCase().includes("sprouted moong"));
+    if (match) return match;
+  }
+
+  if (nameLower.includes("juice") || nameLower.includes("cola") || nameLower.includes("soda") || nameLower.includes("shake")) {
+    const match = all.find(f => f.name.toLowerCase().includes("tender coconut") || f.name.toLowerCase().includes("buttermilk") || f.name.toLowerCase().includes("kattan chaya"));
+    if (match) return match;
+  }
+
+  if (nameLower.includes("chips") || nameLower.includes("crisp") || nameLower.includes("lay")) {
+    const match = all.find(f => f.id !== item.id && f.name.toLowerCase() !== nameLower && (
+      f.name.toLowerCase().includes("makhana") || 
+      f.name.toLowerCase().includes("sweet potato") || 
+      f.name.toLowerCase().includes("too yumm") ||
+      f.name.toLowerCase().includes("roasted")
+    ));
+    if (match) return match;
+  }
+
+  if (nameLower.includes("noodle") || nameLower.includes("maggi") || nameLower.includes("pasta")) {
+    const match = all.find(f => f.id !== item.id && f.name.toLowerCase() !== nameLower && (
+      f.name.toLowerCase().includes("foxtail") || 
+      f.name.toLowerCase().includes("atta noodles") ||
+      f.name.toLowerCase().includes("millet")
+    ));
+    if (match) return match;
+  }
+
+  if (nameLower.includes("dosa") && item.healthScore < 85) {
+    const match = all.find(f => f.id !== item.id && f.name.toLowerCase() !== nameLower && (
+      f.name.toLowerCase().includes("ragi dosa") || 
+      f.name.toLowerCase().includes("oats idli") || 
+      f.name.toLowerCase().includes("idli")
+    ));
+    if (match) return match;
+  }
+
+  // 2. Category-based search for higher health score & lower calories/sugar
+  const categoryAlternatives = all.filter(f => 
+    f.id !== item.id &&
+    f.name.toLowerCase() !== nameLower &&
+    f.category === item.category && 
+    f.healthScore > item.healthScore &&
+    f.calories < item.calories
+  );
+  if (categoryAlternatives.length > 0) {
+    return categoryAlternatives.sort((a, b) => b.healthScore - a.healthScore)[0];
+  }
+
+  // 3. Fallback to whole wheat / sprout / clean item
+  const genericClean = all.find(f => f.id !== item.id && f.name.toLowerCase() !== nameLower && f.healthScore >= 90 && f.safeForDiabetic);
+  return genericClean || item;
+}
+
 // Helper Function: Match barcode or brand product
 export function lookupPackagedProduct(query: string): PackagedProduct | undefined {
   const clean = query.trim().toLowerCase();
-  return PACKAGED_PRODUCTS_DATASET.find(p => 
-    p.barcode === clean || p.productName.toLowerCase().includes(clean) || p.brand.toLowerCase().includes(clean)
+  return (
+    lookupComprehensivePackagedProduct(clean) ||
+    PACKAGED_PRODUCTS_DATASET.find(p => 
+      p.barcode === clean || p.productName.toLowerCase().includes(clean) || p.brand.toLowerCase().includes(clean)
+    )
   );
 }
 

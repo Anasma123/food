@@ -141,22 +141,22 @@ export default function CameraCaptureModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-fadeIn">
-      <div className="bg-[#0b101c] border border-white/20 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col">
+    <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-fadeIn">
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-white">
           <div>
             <div className="flex items-center gap-2">
-              <Camera className="w-5 h-5 text-emerald-400" />
-              <h3 className="text-base font-bold text-white">{title}</h3>
+              <Camera className="w-5 h-5 text-emerald-600" />
+              <h3 className="text-base font-bold text-slate-900">{title}</h3>
             </div>
-            <p className="text-[11px] text-slate-400 mt-0.5">
+            <p className="text-[11px] text-slate-500 mt-0.5">
               {subtitle || "Align item within camera frame and capture"}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+            className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -248,19 +248,19 @@ export default function CameraCaptureModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 bg-[#080d19] border-t border-white/10 flex items-center justify-between gap-3">
+        <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
           {capturedPreview ? (
             <>
               <button
                 onClick={handleRetake}
-                className="flex-1 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs transition-colors flex items-center justify-center gap-2"
+                className="flex-1 py-3 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
                 <RefreshCw className="w-4 h-4" />
                 Retake Photo
               </button>
               <button
                 onClick={handleConfirmSnapshot}
-                className="flex-1 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black text-xs hover:brightness-110 shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2"
+                className="flex-1 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Check className="w-4 h-4" />
                 Use Photo for AI Analysis
@@ -270,14 +270,14 @@ export default function CameraCaptureModal({
             <>
               <button
                 onClick={onClose}
-                className="px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs transition-colors"
+                className="px-4 py-3 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold text-xs transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 disabled={isInitializing || !!cameraError}
                 onClick={handleCaptureSnapshot}
-                className="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 text-slate-950 font-black text-xs hover:brightness-110 shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 <Camera className="w-4 h-4" />
                 Take Snapshot & Analyze

@@ -625,7 +625,7 @@ export default function ExplainFeatureModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md animate-fadeIn">
       <div className="relative w-full max-w-3xl max-h-[90vh] bg-slate-900 border border-white/20 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
         {/* Header */}
         <div className="p-5 sm:p-6 border-b border-white/10 bg-white/[0.03] flex items-center justify-between gap-4 flex-wrap">
@@ -650,7 +650,7 @@ export default function ExplainFeatureModal({
 
           <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             {/* Language Switcher Bar */}
-            <div className="flex items-center bg-black/60 border border-white/15 rounded-xl p-1 gap-1">
+            <div className="flex items-center bg-slate-900/40 border border-white/15 rounded-xl p-1 gap-1">
               <button
                 type="button"
                 onClick={() => handleSelectLang("en")}
@@ -767,7 +767,7 @@ export default function ExplainFeatureModal({
             </h4>
             <div className="space-y-2">
               {content.stepByStep.map((step, idx) => (
-                <div key={idx} className="flex items-start gap-3 p-2.5 rounded-xl bg-black/30 border border-white/5 text-xs">
+                <div key={idx} className="flex items-start gap-3 p-2.5 rounded-xl bg-slate-900/40 border border-white/5 text-xs">
                   <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-[11px] shrink-0">
                     {idx + 1}
                   </span>
@@ -797,7 +797,7 @@ export default function ExplainFeatureModal({
               <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-300">
                 {language === "ml" ? "യഥാർത്ഥ ഉദാഹരണം" : language === "hi" ? "वास्तविक उदाहरण" : "Real-World Example"}
               </h4>
-              <p className="text-xs text-slate-200 leading-relaxed font-mono bg-black/40 p-3 rounded-xl border border-white/10">
+              <p className="text-xs text-slate-200 leading-relaxed font-mono bg-slate-900/40 p-3 rounded-xl border border-white/10">
                 {content.exampleResult}
               </p>
             </div>

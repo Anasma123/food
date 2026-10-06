@@ -580,7 +580,7 @@ export default function AppWorkflowGuide({
           </div>
 
           {/* LANGUAGE SELECTOR BAR */}
-          <div className="p-4 rounded-2xl bg-black/50 border border-white/15 backdrop-blur-md shrink-0 space-y-2">
+          <div className="p-4 rounded-2xl bg-slate-900/40 border border-white/15 backdrop-blur-md shrink-0 space-y-2">
             <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
               <Globe className="w-4 h-4 text-emerald-400" />
               <span>{currentT.languageSelector}</span>
@@ -718,7 +718,7 @@ export default function AppWorkflowGuide({
             </div>
 
             {/* How it works breakdown */}
-            <div className="space-y-2.5 bg-black/30 p-4 sm:p-5 rounded-2xl border border-white/10">
+            <div className="space-y-2.5 bg-slate-900/40 p-4 sm:p-5 rounded-2xl border border-white/10">
               <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4" />
                 {lang === "ml" ? "പ്രവർത്തന രീതി" : lang === "hi" ? "कार्य प्रणाली" : "How It Works Under the Hood"}
@@ -854,7 +854,7 @@ export default function AppWorkflowGuide({
                     {st.summary}
                   </p>
 
-                  <div className="p-3 rounded-xl bg-black/40 border border-white/5 text-[11px] text-slate-300 font-mono">
+                  <div className="p-3 rounded-xl bg-slate-900/40 border border-white/5 text-[11px] text-slate-300 font-mono">
                     {st.example}
                   </div>
                 </div>

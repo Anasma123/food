@@ -138,7 +138,7 @@ export default function PageGuideBanner({
       {isExpanded && (
         <div className="px-4 pb-5 sm:px-6 sm:pb-6 pt-2 border-t border-white/10 space-y-5 text-xs text-slate-300 animate-fadeIn">
           {/* Summary */}
-          <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 text-slate-200 leading-relaxed">
+          <div className="p-3.5 rounded-2xl bg-slate-900/40 border border-white/10 text-slate-200 leading-relaxed">
             <p>{guide.summary}</p>
           </div>
 
@@ -188,7 +188,7 @@ export default function PageGuideBanner({
               </ul>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 space-y-1.5">
+            <div className="p-3.5 rounded-2xl bg-slate-900/40 border border-white/10 space-y-1.5">
               <h5 className="text-[11px] font-bold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
                 Example Output
