@@ -76,7 +76,7 @@ interface DietFullAnalysisViewProps {
   workouts: DailyWorkoutLog[];
   userProfile: UserHealthProfile;
   language?: AppLanguage;
-  onSelectDate: (date: string) => void;
+  onSelectDate?: (date: string) => void;
   onBackToOverview?: () => void;
 }
 
@@ -816,7 +816,7 @@ export default function DietFullAnalysisView({
               </span>
             </div>
             <button
-              onClick={() => onSelectDate(hoveredDay.date)}
+              onClick={() => onSelectDate?.(hoveredDay.date)}
               className="text-[11px] bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 px-3 py-1 rounded-lg border border-emerald-500/30 font-bold transition-all cursor-pointer"
             >
               Open in Dashboard →
@@ -1196,7 +1196,7 @@ export default function DietFullAnalysisView({
                     <td className="py-3 px-3 text-right">
                       <button
                         onClick={() => {
-                          onSelectDate(day.date);
+                          onSelectDate?.(day.date);
                           if (onBackToOverview) onBackToOverview();
                         }}
                         className="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-emerald-500/20 hover:text-emerald-300 border border-white/10 text-slate-300 text-[11px] font-bold transition-all cursor-pointer inline-flex items-center gap-1"
@@ -1487,7 +1487,7 @@ export default function DietFullAnalysisView({
                   key={day.date}
                   onMouseEnter={() => setHoveredDay(day)}
                   onMouseLeave={() => setHoveredDay(null)}
-                  onClick={() => onSelectDate(day.date)}
+                  onClick={() => onSelectDate?.(day.date)}
                   className="flex-1 flex flex-col items-center justify-end h-full group cursor-pointer relative"
                 >
                   <div className="w-full flex items-end justify-center gap-1 h-full">
@@ -1549,7 +1549,7 @@ export default function DietFullAnalysisView({
                   key={day.date}
                   onMouseEnter={() => setHoveredDay(day)}
                   onMouseLeave={() => setHoveredDay(null)}
-                  onClick={() => onSelectDate(day.date)}
+                  onClick={() => onSelectDate?.(day.date)}
                   className="flex-1 flex flex-col items-center justify-end h-full group cursor-pointer"
                 >
                   <div
@@ -1620,7 +1620,7 @@ export default function DietFullAnalysisView({
                     key={day.date}
                     onMouseEnter={() => setHoveredDay(day)}
                     onMouseLeave={() => setHoveredDay(null)}
-                    onClick={() => onSelectDate(day.date)}
+                    onClick={() => onSelectDate?.(day.date)}
                     className="flex-1 flex flex-col items-center justify-between h-full group cursor-pointer relative"
                   >
                     {/* Top Half: Surplus */}
@@ -1720,7 +1720,7 @@ export default function DietFullAnalysisView({
                   className="cursor-pointer group"
                   onMouseEnter={() => setHoveredDay(p.day)}
                   onMouseLeave={() => setHoveredDay(null)}
-                  onClick={() => onSelectDate(p.day.date)}
+                  onClick={() => onSelectDate?.(p.day.date)}
                 >
                   <circle
                     cx={p.x}

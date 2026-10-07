@@ -19,7 +19,7 @@ import {
   Heart,
   ChevronRight
 } from "lucide-react";
-import { UserHealthProfile } from "./AIFoodScannerView";
+import { UserHealthProfile } from "./TruthInScannerView";
 
 interface MealLogItem {
   id: string;

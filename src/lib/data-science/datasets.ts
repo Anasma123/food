@@ -1961,7 +1961,7 @@ export function searchNutritionalDatasets(query: string): NutritionalItem[] {
     return [{
       id: packagedMatch.barcode,
       name: `${packagedMatch.brand} ${packagedMatch.productName}`,
-      category: "packaged_food",
+      category: "packaged",
       imageUrl: packagedMatch.imageUrl,
       servingSize: "100g",
       calories: packagedMatch.caloriesPer100g,
@@ -1972,7 +1972,12 @@ export function searchNutritionalDatasets(query: string): NutritionalItem[] {
       fiber: 2.5,
       glycemicIndex: packagedMatch.sugarPer100g > 15 ? 75 : 55,
       allergens: [],
-      healthScore: Math.round(packagedMatch.truthInScore * 20),
+      healthScore: (() => {
+        const nutriscoreScores: Record<string, number> = { A: 90, B: 75, C: 55, D: 35, E: 20 };
+        const base = nutriscoreScores[packagedMatch.nutriscoreGrade] ?? 50;
+        const novaPen = packagedMatch.novaGroup === 4 ? 15 : packagedMatch.novaGroup === 3 ? 5 : 0;
+        return Math.max(10, Math.min(100, base - novaPen));
+      })(),
       safeForDiabetic: packagedMatch.sugarPer100g <= 5,
       dietRecommendation: packagedMatch.healthWarnings.join(". ") || "Packaged food item.",
       healthyAlternative: "Choose fresh whole food alternatives."

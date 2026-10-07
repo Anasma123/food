@@ -847,8 +847,12 @@ export default function AIFoodProductionApp() {
   };
 
   // Fluid Navigation handler across all application pages
-  const navigateTab = (targetTab: AppPageTab) => {
-    setActiveTab(targetTab);
+  const navigateTab = (targetTab: AppPageTab | string) => {
+    if (targetTab === "barcode_scanner") {
+      setActiveTab("truthin_scanner");
+    } else {
+      setActiveTab(targetTab as AppPageTab);
+    }
   };
 
   const handleLogout = () => {
@@ -1994,7 +1998,7 @@ export default function AIFoodProductionApp() {
       {/* =================================================================== */}
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 pt-4 sm:pt-6 w-full max-w-full overflow-x-hidden space-y-6">
         {/* TRUTHIN SCANNER & DECODER PAGE */}
-        {(activeTab === "truthin_scanner" || activeTab === "barcode_scanner") && (
+        {(activeTab === "truthin_scanner" || (activeTab as string) === "barcode_scanner") && (
           <TruthInScannerView
             userProfile={userProfile}
             externalScannedProduct={scannedProductResult?.product || null}
@@ -2028,6 +2032,7 @@ export default function AIFoodProductionApp() {
             workouts={todayWorkouts}
             userProfile={userProfile}
             language={currentLanguage}
+            onSelectDate={(date) => setActiveTab("dashboard")}
             onBackToOverview={() => setActiveTab("dashboard")}
           />
         )}
@@ -2064,7 +2069,7 @@ export default function AIFoodProductionApp() {
             onOpenLiveCamera={() => {
               setCameraTarget("meal_scanner");
               setCameraTitle("Capture Meal Plate Photo");
-              setCameraOverlay("plate");
+              setCameraOverlay("food");
               setCameraModalOpen(true);
             }}
             onLogMeal={handleQuickLogMeal}

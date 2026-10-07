@@ -138,7 +138,7 @@ export default function AppWorkflowGuide({
           ],
           example: "Example: Scanning potato chips detects Monosodium Glutamate (E621) and high saturated fat, giving a 'Grade C / Caution' recommendation.",
           userAction: "Open Packaged Food Scanner and enter barcode or upload packet picture.",
-          navTarget: "barcode_scanner"
+          navTarget: "truthin_scanner"
         },
         {
           id: 5,
@@ -289,7 +289,7 @@ export default function AppWorkflowGuide({
           ],
           example: "ഉദാഹരണം: ലെയ്സ് ചിപ്സ് സ്കാൻ ചെയ്യുമ്പോൾ E621 ഫ്ലേവർ എൻഹാൻസറും ഉയർന്ന ഫാറ്റും കണ്ടെത്തി മുന്നറിയിപ്പ് നൽകും.",
           userAction: "Packaged Food Scanner തുറന്ന് ബാർകോഡോ ഫോട്ടോയോ നൽകുക.",
-          navTarget: "barcode_scanner"
+          navTarget: "truthin_scanner"
         },
         {
           id: 5,
@@ -439,7 +439,7 @@ export default function AppWorkflowGuide({
           ],
           example: "उदाहरण: चिप्स पैकेट स्कैन करने पर एमएसजी और पाम ऑयल की चेतावनी।",
           userAction: "बारकोड डालें या पैकेट की फोटो अपलोड करें।",
-          navTarget: "barcode_scanner"
+          navTarget: "truthin_scanner"
         },
         {
           id: 5,
